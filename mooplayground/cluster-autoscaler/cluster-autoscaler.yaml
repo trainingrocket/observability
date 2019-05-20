@@ -208,6 +208,10 @@ metadata:
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: aws-cluster-autoscaler
+      release: cluster-autoscaler
   template:
     metadata:
       annotations:
