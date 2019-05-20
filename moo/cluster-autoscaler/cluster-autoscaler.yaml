@@ -3,8 +3,6 @@ kind: ServiceAccount
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.13.1
-    heritage: Tiller
     release: cluster-autoscaler
   name: cluster-autoscaler-aws-cluster-autoscaler
 ---
@@ -13,8 +11,6 @@ kind: Role
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.13.1
-    heritage: Tiller
     release: cluster-autoscaler
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
@@ -40,8 +36,6 @@ kind: ClusterRole
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.13.1
-    heritage: Tiller
     release: cluster-autoscaler
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
@@ -152,8 +146,6 @@ kind: RoleBinding
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.13.1
-    heritage: Tiller
     release: cluster-autoscaler
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
@@ -170,8 +162,6 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.13.1
-    heritage: Tiller
     release: cluster-autoscaler
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
@@ -196,8 +186,6 @@ kind: Service
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.13.1
-    heritage: Tiller
     release: cluster-autoscaler
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
@@ -216,12 +204,14 @@ kind: Deployment
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.13.1
-    heritage: Tiller
     release: cluster-autoscaler
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: aws-cluster-autoscaler
+      release: cluster-autoscaler
   template:
     metadata:
       annotations:
@@ -275,8 +265,6 @@ kind: PodDisruptionBudget
 metadata:
   labels:
     app: aws-cluster-autoscaler
-    chart: cluster-autoscaler-0.13.1
-    heritage: Tiller
     release: cluster-autoscaler
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
