@@ -7,7 +7,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: alertmanagers.monitoring.coreos.com
@@ -2411,7 +2411,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheuses.monitoring.coreos.com
@@ -5619,7 +5619,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheusrules.monitoring.coreos.com
@@ -5965,7 +5965,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: servicemonitors.monitoring.coreos.com
@@ -6322,7 +6322,7 @@ kind: Role
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6345,7 +6345,7 @@ kind: Role
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6368,7 +6368,7 @@ kind: Role
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6805,7 +6805,7 @@ kind: RoleBinding
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6824,7 +6824,7 @@ kind: RoleBinding
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6843,7 +6843,7 @@ kind: RoleBinding
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -20508,7 +20508,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-operator
-        chart: prometheus-operator-5.10.5
+        chart: prometheus-operator-5.11.0
         heritage: Tiller
         release: prometheus-operator
     spec:
@@ -20518,9 +20518,9 @@ spec:
         - --logtostderr=true
         - --crd-apigroup=monitoring.coreos.com
         - --localhost=127.0.0.1
-        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.29.0
+        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.30.0
         - --config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1
-        image: quay.io/coreos/prometheus-operator:v0.29.0
+        image: quay.io/coreos/prometheus-operator:v0.30.0
         imagePullPolicy: IfNotPresent
         name: prometheus-operator
         ports:
@@ -20553,10 +20553,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: e4e0e2b6f4e0d14f0fb0b2a7262cc10f104741bd10afb3101127241cb72af4ce
+        checksum/config: c91520bf2b2be027a77c095ef42155b03997f3ce1bb5c0cf2fe73ffdaab0fbf1
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: aea1484a40f4be20b4bc942ff1ed533b09f6f2f2c7e1879ce911f81b3d003d62
-        checksum/secret: 8eaea31db928ced1af89fb91093354d7a11196a0b21ab60d7ce70f4f7310dce8
+        checksum/sc-dashboard-provider-config: bf4c8db719e02c4805011f112a765c8be34fe3968d7d8d445b2676f43d924407
+        checksum/secret: 7181e24a2daebc9bd1f0d708196a1f6c95430543e9e08920c9a5b2cb639c7799
       labels:
         app: grafana
         release: prometheus-operator
@@ -21018,7 +21018,7 @@ kind: Alertmanager
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -21043,7 +21043,7 @@ kind: Prometheus
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -21085,7 +21085,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager.rules
@@ -21128,7 +21128,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-etcd
@@ -21269,7 +21269,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-general.rules
@@ -21301,7 +21301,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-k8s.rules
@@ -21387,7 +21387,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-apiserver.rules
@@ -21416,7 +21416,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-prometheus-node-alerting.rules
@@ -21448,7 +21448,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-prometheus-node-recording.rules
@@ -21481,7 +21481,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler.rules
@@ -21540,7 +21540,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-absent
@@ -21628,7 +21628,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-apps
@@ -21793,7 +21793,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-resources
@@ -21888,7 +21888,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-storage
@@ -21943,7 +21943,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-system
@@ -22094,7 +22094,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-network
@@ -22134,7 +22134,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-time
@@ -22156,7 +22156,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node.rules
@@ -22348,7 +22348,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus-operator
@@ -22379,7 +22379,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus.rules
@@ -22494,7 +22494,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: ark-metrics
@@ -22526,7 +22526,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: helm-exporter
@@ -22558,7 +22558,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: nginx-ingress-controller-metrics
@@ -22590,7 +22590,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -22611,7 +22611,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-apiserver
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-apiserver
@@ -22638,7 +22638,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-coredns
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-coredns
@@ -22660,7 +22660,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-grafana
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-grafana
@@ -22681,7 +22681,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-controller-manager
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-controller-manager
@@ -22703,7 +22703,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-etcd
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-etcd
@@ -22725,7 +22725,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-scheduler
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler
@@ -22747,7 +22747,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-state-metrics
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-state-metrics
@@ -22766,7 +22766,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kubelet
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubelet
@@ -22800,7 +22800,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-node-exporter
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-exporter
@@ -22818,7 +22818,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-operator
@@ -22839,7 +22839,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.10.5
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
