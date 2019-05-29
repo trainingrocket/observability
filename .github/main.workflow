@@ -39,7 +39,7 @@ action "Deploy Manifests To Cluster" {
    ]
   runs = "sh -l -c"
   args = [ 
-      "SHORT_REF=$(echo $GITHUB_SHA | head -c7) && cat $GITHUB_WORKSPACE/mooplayground/prometheus-operator/ | sed 's/TAG/'\"$SHORT_REF\"'/' | kubectl apply -f - "
+      "SHORT_REF=$(echo $GITHUB_SHA | head -c7) && cat $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml | sed 's/TAG/'\"$SHORT_REF\"'/' | kubectl apply -f - "
   ]
   env = { }
   secrets = [
