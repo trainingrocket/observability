@@ -7,7 +7,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: alertmanagers.monitoring.coreos.com
@@ -2411,7 +2411,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheuses.monitoring.coreos.com
@@ -5619,7 +5619,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheusrules.monitoring.coreos.com
@@ -5965,7 +5965,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: servicemonitors.monitoring.coreos.com
@@ -6322,7 +6322,7 @@ kind: Role
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6345,11 +6345,11 @@ kind: Role
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
-  namespace: default
+  namespace: kube-system
 rules:
 - apiGroups:
   - ""
@@ -6368,11 +6368,11 @@ kind: Role
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
-  namespace: kube-system
+  namespace: monitoring
 rules:
 - apiGroups:
   - ""
@@ -6535,11 +6535,13 @@ rules:
   - ""
   resources:
   - services
+  - services/finalizers
   - endpoints
   verbs:
   - get
   - create
   - update
+  - delete
 - apiGroups:
   - ""
   resources:
@@ -6803,7 +6805,7 @@ kind: RoleBinding
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6815,33 +6817,14 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-prometheus
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
-    heritage: Tiller
-    release: prometheus-operator
-  name: prometheus-operator-prometheus
-  namespace: default
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: prometheus-operator-prometheus
-subjects:
-- kind: ServiceAccount
-  name: prometheus-operator-prometheus
-  namespace: default
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  labels:
-    app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6853,7 +6836,26 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-prometheus
-  namespace: default
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app: prometheus-operator-prometheus
+    chart: prometheus-operator-5.11.0
+    heritage: Tiller
+    release: prometheus-operator
+  name: prometheus-operator-prometheus
+  namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prometheus-operator-prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator-prometheus
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -6869,7 +6871,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-grafana-test
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -6885,7 +6887,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-prometheus
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
@@ -6901,7 +6903,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-grafana
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -6917,7 +6919,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-alertmanager
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -6933,7 +6935,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-grafana
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -6949,7 +6951,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-operator
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -6965,7 +6967,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-operator
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -6981,7 +6983,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-prometheus
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -6997,7 +6999,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-prometheus
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -7013,7 +7015,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-kube-state-metrics
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -7029,7 +7031,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-kube-state-metrics
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -7046,7 +7048,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-prometheus-node-exporter
-  namespace: default
+  namespace: monitoring
 ---
 apiVersion: v1
 data:
@@ -7061,7 +7063,7 @@ data:
         "hideControls": false,
         "id": 6,
         "links": [],
-        "refresh": false,
+        "refresh": "10s",
         "rows": [
             {
                 "collapse": false,
@@ -12601,24 +12603,6 @@ data:
                                 "unit": "short"
                             },
                             {
-                                "alias": "CPU Usage",
-                                "colorMode": null,
-                                "colors": [
-
-                                ],
-                                "dateFormat": "YYYY-MM-DD HH:mm:ss",
-                                "decimals": 2,
-                                "link": false,
-                                "linkTooltip": "Drill down",
-                                "linkUrl": "",
-                                "pattern": "Value #C",
-                                "thresholds": [
-
-                                ],
-                                "type": "number",
-                                "unit": "short"
-                            },
-                            {
                                 "alias": "Memory Usage",
                                 "colorMode": null,
                                 "colors": [
@@ -12629,7 +12613,7 @@ data:
                                 "link": false,
                                 "linkTooltip": "Drill down",
                                 "linkUrl": "",
-                                "pattern": "Value #D",
+                                "pattern": "Value #C",
                                 "thresholds": [
 
                                 ],
@@ -12647,7 +12631,7 @@ data:
                                 "link": false,
                                 "linkTooltip": "Drill down",
                                 "linkUrl": "",
-                                "pattern": "Value #E",
+                                "pattern": "Value #D",
                                 "thresholds": [
 
                                 ],
@@ -12665,7 +12649,7 @@ data:
                                 "link": false,
                                 "linkTooltip": "Drill down",
                                 "linkUrl": "",
-                                "pattern": "Value #F",
+                                "pattern": "Value #E",
                                 "thresholds": [
 
                                 ],
@@ -12683,7 +12667,7 @@ data:
                                 "link": false,
                                 "linkTooltip": "Drill down",
                                 "linkUrl": "",
-                                "pattern": "Value #G",
+                                "pattern": "Value #F",
                                 "thresholds": [
 
                                 ],
@@ -12701,7 +12685,7 @@ data:
                                 "link": false,
                                 "linkTooltip": "Drill down",
                                 "linkUrl": "",
-                                "pattern": "Value #H",
+                                "pattern": "Value #G",
                                 "thresholds": [
 
                                 ],
@@ -17578,11 +17562,18 @@ data:
                         "steppedLine": false,
                         "targets": [
                             {
-                                "expr": "node:node_filesystem_usage:{cluster=\"$cluster\"}",
+                                "expr": "max by (namespace, pod, device) ((node_filesystem_size_bytes{cluster=\"$cluster\", fstype=~\"ext[234]|btrfs|xfs|zfs\", instance=\"$instance\", job=\"node-exporter\"} - node_filesystem_avail_bytes{cluster=\"$cluster\", fstype=~\"ext[234]|btrfs|xfs|zfs\", instance=\"$instance\", job=\"node-exporter\"}) / node_filesystem_size_bytes{cluster=\"$cluster\", fstype=~\"ext[234]|btrfs|xfs|zfs\", instance=\"$instance\", job=\"node-exporter\"})",
                                 "format": "time_series",
                                 "intervalFactor": 2,
-                                "legendFormat": "{{device}}",
+                                "legendFormat": "disk used",
                                 "refId": "A"
+                            },
+                            {
+                                "expr": "max by (namespace, pod, device) (node_filesystem_avail_bytes{cluster=\"$cluster\", fstype=~\"ext[234]|btrfs|xfs|zfs\", instance=\"$instance\", job=\"node-exporter\"} / node_filesystem_size_bytes{cluster=\"$cluster\", fstype=~\"ext[234]|btrfs|xfs|zfs\", instance=\"$instance\", job=\"node-exporter\"})",
+                                "format": "time_series",
+                                "intervalFactor": 2,
+                                "legendFormat": "disk free",
+                                "refId": "B"
                             }
                         ],
                         "thresholds": [
@@ -20517,7 +20508,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-operator
-        chart: prometheus-operator-5.7.0
+        chart: prometheus-operator-5.11.0
         heritage: Tiller
         release: prometheus-operator
     spec:
@@ -20527,9 +20518,9 @@ spec:
         - --logtostderr=true
         - --crd-apigroup=monitoring.coreos.com
         - --localhost=127.0.0.1
-        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.29.0
+        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.30.0
         - --config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1
-        image: quay.io/coreos/prometheus-operator:v0.29.0
+        image: quay.io/coreos/prometheus-operator:v0.30.0
         imagePullPolicy: IfNotPresent
         name: prometheus-operator
         ports:
@@ -20562,10 +20553,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: ae939d343163af086c0e3955ee1f2da7cdb5441d47c0f4600a97a83391c5d3c1
+        checksum/config: c91520bf2b2be027a77c095ef42155b03997f3ce1bb5c0cf2fe73ffdaab0fbf1
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: 955fbaf28241c88f7233dc48a3722a4ff82885118d85992b3bd0ba554c4b5e73
-        checksum/secret: 1a17172f1f96d040ef88411c1288441690f12f4221dc8cf03591d01fbf038d7e
+        checksum/sc-dashboard-provider-config: bf4c8db719e02c4805011f112a765c8be34fe3968d7d8d445b2676f43d924407
+        checksum/secret: 7181e24a2daebc9bd1f0d708196a1f6c95430543e9e08920c9a5b2cb639c7799
       labels:
         app: grafana
         release: prometheus-operator
@@ -20594,7 +20585,7 @@ spec:
             secretKeyRef:
               key: admin-password
               name: prometheus-operator-grafana
-        image: grafana/grafana:6.1.6
+        image: grafana/grafana:6.2.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
@@ -21027,7 +21018,7 @@ kind: Alertmanager
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -21045,14 +21036,14 @@ spec:
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: prometheus-operator-alertmanager
-  version: v0.16.2
+  version: v0.17.0
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -21060,10 +21051,11 @@ spec:
   alerting:
     alertmanagers:
     - name: prometheus-operator-alertmanager
-      namespace: default
+      namespace: monitoring
       pathPrefix: /
       port: web
   baseImage: quay.io/prometheus/prometheus
+  enableAdminAPI: false
   externalUrl: http://prometheus.ent.learndot.com/
   listenLocal: false
   logFormat: logfmt
@@ -21093,7 +21085,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager.rules
@@ -21105,8 +21097,8 @@ spec:
       annotations:
         message: The configuration of the instances of the Alertmanager cluster `{{$labels.service}}`
           are out of sync.
-      expr: count_values("config_hash", alertmanager_config_hash{job="prometheus-operator-alertmanager",namespace="default"})
-        BY (service) / ON(service) GROUP_LEFT() label_replace(prometheus_operator_spec_replicas{job="prometheus-operator-operator",namespace="default",controller="alertmanager"},
+      expr: count_values("config_hash", alertmanager_config_hash{job="prometheus-operator-alertmanager",namespace="monitoring"})
+        BY (service) / ON(service) GROUP_LEFT() label_replace(prometheus_operator_spec_replicas{job="prometheus-operator-operator",namespace="monitoring",controller="alertmanager"},
         "service", "$1", "name", "(.*)") != 1
       for: 5m
       labels:
@@ -21115,7 +21107,7 @@ spec:
       annotations:
         message: Reloading Alertmanager's configuration has failed for {{ $labels.namespace
           }}/{{ $labels.pod}}.
-      expr: alertmanager_config_last_reload_successful{job="prometheus-operator-alertmanager",namespace="default"}
+      expr: alertmanager_config_last_reload_successful{job="prometheus-operator-alertmanager",namespace="monitoring"}
         == 0
       for: 10m
       labels:
@@ -21124,9 +21116,9 @@ spec:
       annotations:
         message: Alertmanager has not found all other members of the cluster.
       expr: |-
-        alertmanager_cluster_members{job="prometheus-operator-alertmanager",namespace="default"}
+        alertmanager_cluster_members{job="prometheus-operator-alertmanager",namespace="monitoring"}
           != on (service) GROUP_LEFT()
-        count by (service) (alertmanager_cluster_members{job="prometheus-operator-alertmanager",namespace="default"})
+        count by (service) (alertmanager_cluster_members{job="prometheus-operator-alertmanager",namespace="monitoring"})
       for: 5m
       labels:
         severity: critical
@@ -21136,7 +21128,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-etcd
@@ -21277,7 +21269,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-general.rules
@@ -21309,7 +21301,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-k8s.rules
@@ -21395,7 +21387,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-apiserver.rules
@@ -21424,7 +21416,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-prometheus-node-alerting.rules
@@ -21456,7 +21448,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-prometheus-node-recording.rules
@@ -21489,7 +21481,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler.rules
@@ -21548,7 +21540,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-absent
@@ -21560,7 +21552,7 @@ spec:
       annotations:
         message: Alertmanager has disappeared from Prometheus target discovery.
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-alertmanagerdown
-      expr: absent(up{job="prometheus-operator-alertmanager",namespace="default"}
+      expr: absent(up{job="prometheus-operator-alertmanager",namespace="monitoring"}
         == 1)
       for: 15m
       labels:
@@ -21617,8 +21609,8 @@ spec:
       annotations:
         message: Prometheus has disappeared from Prometheus target discovery.
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-prometheusdown
-      expr: absent(up{job="prometheus-operator-prometheus",namespace="default"} ==
-        1)
+      expr: absent(up{job="prometheus-operator-prometheus",namespace="monitoring"}
+        == 1)
       for: 15m
       labels:
         severity: critical
@@ -21626,7 +21618,8 @@ spec:
       annotations:
         message: PrometheusOperator has disappeared from Prometheus target discovery.
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-prometheusoperatordown
-      expr: absent(up{job="prometheus-operator-operator",namespace="default"} == 1)
+      expr: absent(up{job="prometheus-operator-operator",namespace="monitoring"} ==
+        1)
       for: 15m
       labels:
         severity: critical
@@ -21636,7 +21629,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-apps
@@ -21801,7 +21794,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-resources
@@ -21896,7 +21889,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-storage
@@ -21951,7 +21944,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-system
@@ -22102,7 +22095,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-network
@@ -22142,7 +22135,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-time
@@ -22164,7 +22157,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node.rules
@@ -22297,11 +22290,11 @@ spec:
         )
       record: node:node_disk_saturation:avg_irate
     - expr: |-
-        max by (namespace, pod, device) ((node_filesystem_size_bytes{fstype=~"ext[234]|btrfs|xfs|zfs"}
+        max by (instance, namespace, pod, device) ((node_filesystem_size_bytes{fstype=~"ext[234]|btrfs|xfs|zfs"}
         - node_filesystem_avail_bytes{fstype=~"ext[234]|btrfs|xfs|zfs"})
         / node_filesystem_size_bytes{fstype=~"ext[234]|btrfs|xfs|zfs"})
       record: 'node:node_filesystem_usage:'
-    - expr: max by (namespace, pod, device) (node_filesystem_avail_bytes{fstype=~"ext[234]|btrfs|xfs|zfs"}
+    - expr: max by (instance, namespace, pod, device) (node_filesystem_avail_bytes{fstype=~"ext[234]|btrfs|xfs|zfs"}
         / node_filesystem_size_bytes{fstype=~"ext[234]|btrfs|xfs|zfs"})
       record: 'node:node_filesystem_avail:'
     - expr: |-
@@ -22356,7 +22349,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus-operator
@@ -22368,7 +22361,7 @@ spec:
       annotations:
         message: Errors while reconciling {{ $labels.controller }} in {{ $labels.namespace
           }} Namespace.
-      expr: rate(prometheus_operator_reconcile_errors_total{job="prometheus-operator-operator",namespace="default"}[5m])
+      expr: rate(prometheus_operator_reconcile_errors_total{job="prometheus-operator-operator",namespace="monitoring"}[5m])
         > 0.1
       for: 10m
       labels:
@@ -22376,7 +22369,7 @@ spec:
     - alert: PrometheusOperatorNodeLookupErrors
       annotations:
         message: Errors while reconciling Prometheus in {{ $labels.namespace }} Namespace.
-      expr: rate(prometheus_operator_node_address_lookup_errors_total{job="prometheus-operator-operator",namespace="default"}[5m])
+      expr: rate(prometheus_operator_node_address_lookup_errors_total{job="prometheus-operator-operator",namespace="monitoring"}[5m])
         > 0.1
       for: 10m
       labels:
@@ -22387,7 +22380,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus.rules
@@ -22399,7 +22392,7 @@ spec:
       annotations:
         description: Reloading Prometheus' configuration has failed for {{$labels.namespace}}/{{$labels.pod}}
         summary: Reloading Prometheus' configuration failed
-      expr: prometheus_config_last_reload_successful{job="prometheus-operator-prometheus",namespace="default"}
+      expr: prometheus_config_last_reload_successful{job="prometheus-operator-prometheus",namespace="monitoring"}
         == 0
       for: 10m
       labels:
@@ -22409,8 +22402,8 @@ spec:
         description: Prometheus' alert notification queue is running full for {{$labels.namespace}}/{{
           $labels.pod}}
         summary: Prometheus' alert notification queue is running full
-      expr: predict_linear(prometheus_notifications_queue_length{job="prometheus-operator-prometheus",namespace="default"}[5m],
-        60 * 30) > prometheus_notifications_queue_capacity{job="prometheus-operator-prometheus",namespace="default"}
+      expr: predict_linear(prometheus_notifications_queue_length{job="prometheus-operator-prometheus",namespace="monitoring"}[5m],
+        60 * 30) > prometheus_notifications_queue_capacity{job="prometheus-operator-prometheus",namespace="monitoring"}
       for: 10m
       labels:
         severity: warning
@@ -22419,8 +22412,8 @@ spec:
         description: Errors while sending alerts from Prometheus {{$labels.namespace}}/{{
           $labels.pod}} to Alertmanager {{$labels.Alertmanager}}
         summary: Errors while sending alert from Prometheus
-      expr: rate(prometheus_notifications_errors_total{job="prometheus-operator-prometheus",namespace="default"}[5m])
-        / rate(prometheus_notifications_sent_total{job="prometheus-operator-prometheus",namespace="default"}[5m])
+      expr: rate(prometheus_notifications_errors_total{job="prometheus-operator-prometheus",namespace="monitoring"}[5m])
+        / rate(prometheus_notifications_sent_total{job="prometheus-operator-prometheus",namespace="monitoring"}[5m])
         > 0.01
       for: 10m
       labels:
@@ -22430,8 +22423,8 @@ spec:
         description: Errors while sending alerts from Prometheus {{$labels.namespace}}/{{
           $labels.pod}} to Alertmanager {{$labels.Alertmanager}}
         summary: Errors while sending alerts from Prometheus
-      expr: rate(prometheus_notifications_errors_total{job="prometheus-operator-prometheus",namespace="default"}[5m])
-        / rate(prometheus_notifications_sent_total{job="prometheus-operator-prometheus",namespace="default"}[5m])
+      expr: rate(prometheus_notifications_errors_total{job="prometheus-operator-prometheus",namespace="monitoring"}[5m])
+        / rate(prometheus_notifications_sent_total{job="prometheus-operator-prometheus",namespace="monitoring"}[5m])
         > 0.03
       for: 10m
       labels:
@@ -22441,7 +22434,7 @@ spec:
         description: Prometheus {{ $labels.namespace }}/{{ $labels.pod}} is not connected
           to any Alertmanagers
         summary: Prometheus is not connected to any Alertmanagers
-      expr: prometheus_notifications_alertmanagers_discovered{job="prometheus-operator-prometheus",namespace="default"}
+      expr: prometheus_notifications_alertmanagers_discovered{job="prometheus-operator-prometheus",namespace="monitoring"}
         < 1
       for: 10m
       labels:
@@ -22451,7 +22444,7 @@ spec:
         description: '{{$labels.job}} at {{$labels.instance}} had {{$value | humanize}}
           reload failures over the last four hours.'
         summary: Prometheus has issues reloading data blocks from disk
-      expr: increase(prometheus_tsdb_reloads_failures_total{job="prometheus-operator-prometheus",namespace="default"}[2h])
+      expr: increase(prometheus_tsdb_reloads_failures_total{job="prometheus-operator-prometheus",namespace="monitoring"}[2h])
         > 0
       for: 12h
       labels:
@@ -22461,7 +22454,7 @@ spec:
         description: '{{$labels.job}} at {{$labels.instance}} had {{$value | humanize}}
           compaction failures over the last four hours.'
         summary: Prometheus has issues compacting sample blocks
-      expr: increase(prometheus_tsdb_compactions_failed_total{job="prometheus-operator-prometheus",namespace="default"}[2h])
+      expr: increase(prometheus_tsdb_compactions_failed_total{job="prometheus-operator-prometheus",namespace="monitoring"}[2h])
         > 0
       for: 12h
       labels:
@@ -22471,7 +22464,7 @@ spec:
         description: '{{$labels.job}} at {{$labels.instance}} has a corrupted write-ahead
           log (WAL).'
         summary: Prometheus write-ahead log is corrupted
-      expr: prometheus_tsdb_wal_corruptions_total{job="prometheus-operator-prometheus",namespace="default"}
+      expr: prometheus_tsdb_wal_corruptions_total{job="prometheus-operator-prometheus",namespace="monitoring"}
         > 0
       for: 4h
       labels:
@@ -22481,7 +22474,7 @@ spec:
         description: Prometheus {{ $labels.namespace }}/{{ $labels.pod}} isn't ingesting
           samples.
         summary: Prometheus isn't ingesting samples
-      expr: rate(prometheus_tsdb_head_samples_appended_total{job="prometheus-operator-prometheus",namespace="default"}[5m])
+      expr: rate(prometheus_tsdb_head_samples_appended_total{job="prometheus-operator-prometheus",namespace="monitoring"}[5m])
         <= 0
       for: 10m
       labels:
@@ -22491,7 +22484,7 @@ spec:
         description: '{{$labels.namespace}}/{{$labels.pod}} has many samples rejected
           due to duplicate timestamps but different values'
         summary: Prometheus has many samples rejected
-      expr: increase(prometheus_target_scrapes_sample_duplicate_timestamp_total{job="prometheus-operator-prometheus",namespace="default"}[5m])
+      expr: increase(prometheus_target_scrapes_sample_duplicate_timestamp_total{job="prometheus-operator-prometheus",namespace="monitoring"}[5m])
         > 0
       for: 10m
       labels:
@@ -22502,7 +22495,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: ark-metrics
@@ -22534,7 +22527,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: helm-exporter
@@ -22566,7 +22559,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: nginx-ingress-controller-metrics
@@ -22598,7 +22591,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -22608,7 +22601,7 @@ spec:
     port: web
   namespaceSelector:
     matchNames:
-    - default
+    - monitoring
   selector:
     matchLabels:
       app: prometheus-operator-alertmanager
@@ -22619,7 +22612,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-apiserver
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-apiserver
@@ -22646,7 +22639,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-coredns
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-coredns
@@ -22668,7 +22661,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-grafana
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-grafana
@@ -22678,7 +22671,7 @@ spec:
     port: service
   namespaceSelector:
     matchNames:
-    - default
+    - monitoring
   selector:
     matchLabels:
       app: grafana
@@ -22689,7 +22682,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-controller-manager
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-controller-manager
@@ -22711,7 +22704,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-etcd
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-etcd
@@ -22733,7 +22726,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-scheduler
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler
@@ -22755,7 +22748,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-state-metrics
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-state-metrics
@@ -22774,7 +22767,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kubelet
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubelet
@@ -22808,7 +22801,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-node-exporter
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-exporter
@@ -22826,7 +22819,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-operator
@@ -22836,7 +22829,7 @@ spec:
     port: http
   namespaceSelector:
     matchNames:
-    - default
+    - monitoring
   selector:
     matchLabels:
       app: prometheus-operator-operator
@@ -22847,7 +22840,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-5.7.0
+    chart: prometheus-operator-5.11.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -22857,7 +22850,7 @@ spec:
     port: web
   namespaceSelector:
     matchNames:
-    - default
+    - monitoring
   selector:
     matchLabels:
       app: prometheus-operator-prometheus
