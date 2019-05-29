@@ -10,8 +10,7 @@ workflow "Deploy Observability to Kubernetes" {
 action "Branch Filter" {
   uses = "actions/bin/filter@master"
   args = [ 
-      "branch master",
-      "branch gitops-for-observability"
+      "branch master"
   ]
 }
 
@@ -40,7 +39,7 @@ action "Deploy Manifests To Cluster" {
    ]
   runs = "sh -l -c"
   args = [ 
-      "kubectl apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/"
+      "SHORT_REF=$(echo $GITHUB_SHA | head -c7) && cat $GITHUB_WORKSPACE/mooplayground/prometheus-operator/ | sed 's/TAG/'\"$SHORT_REF\"'/' | kubectl apply -f - "
   ]
   env = { }
   secrets = [
