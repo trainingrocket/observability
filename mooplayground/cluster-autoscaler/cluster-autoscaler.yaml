@@ -155,7 +155,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: cluster-autoscaler-aws-cluster-autoscaler
-  namespace: default
+  namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -171,7 +171,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: cluster-autoscaler-aws-cluster-autoscaler
-  namespace: default
+  namespace: kube-system
 ---
 apiVersion: v1
 data:
@@ -224,7 +224,7 @@ spec:
       - command:
         - ./cluster-autoscaler
         - --cloud-provider=aws
-        - --namespace=default
+        - --namespace=kube-system
         - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,kubernetes.io/cluster/mooplayground
         - --logtostderr=true
         - --scale-down-utilization-threshold=1.5
