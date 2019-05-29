@@ -11,6 +11,7 @@ action "Branch Filter" {
   uses = "actions/bin/filter@master"
   args = [ 
       "branch master"
+      "branch gitops-for-observability"
   ]
 }
 
