@@ -1,17 +1,28 @@
-workflow "Deploy Observability to Kubernetes" {
+workflow "Build and Deploy" {
   on = "push"
-  resolves = [ 
-      "Branch Filter",
-      "Configure Cluster Credentials",
-      "Deploy Manifests To Cluster"
-   ]
+  resolves = [
+      "Verify EKS Deployment"
+    ]
+}
+
+action "Build Docker Image" {
+  uses = "actions/docker/cli@master"
+  args = [
+      "build", 
+      "--tag", 
+      "aws-example", 
+      "."
+    ]
 }
 
 action "Branch Filter" {
   uses = "actions/bin/filter@master"
-  args = [ 
+  needs = [
+        "Build Docker Image"
+    ]
+  args = [
       "branch master"
-  ]
+    ]
 }
 
 action "Configure Cluster Credentials" {
@@ -32,18 +43,31 @@ action "Configure Cluster Credentials" {
   ]
 }
 
-action "Deploy Manifests To Cluster" {
-  uses = "./.github/actions/eks-kubectl"
+action "Deploy to EKS" {
+  uses = "actions/aws/kubectl@master"
   needs = [
       "Configure Cluster Credentials"
-   ]
+    ]
   runs = "sh -l -c"
-  args = [ 
-      "SHORT_REF=$(echo $GITHUB_SHA | head -c7) && cat $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml | sed 's/TAG/'\"$SHORT_REF\"'/' | kubectl apply -f - "
-  ]
-  env = { }
+  args = [
+      "kubectl apply -f $GITHUB_WORKSPACE/prometheus-operator/prometheus-operator.yaml -n monitoring"
+    ]
   secrets = [
       "AWS_ACCESS_KEY_ID", 
       "AWS_SECRET_ACCESS_KEY"
-   ]
+    ]
+}
+
+action "Verify EKS Deployment" {
+  uses = "actions/aws/kubectl@master"
+  needs = [
+      "Deploy to EKS"
+    ]
+  args = [
+      "rollout status deployment/prometheus-operator"
+    ]
+  secrets = [
+      "AWS_ACCESS_KEY_ID", 
+      "AWS_SECRET_ACCESS_KEY"
+    ]
 }
