@@ -41,7 +41,8 @@ action "Deploy to EKS" {
     ]
   secrets = [
       "AWS_ACCESS_KEY_ID", 
-      "AWS_SECRET_ACCESS_KEY"
+      "AWS_SECRET_ACCESS_KEY",
+      "KUBE_CONFIG_DATA",
     ]
 }
 
@@ -55,6 +56,7 @@ action "Verify EKS Deployment" {
     ]
   secrets = [
       "AWS_ACCESS_KEY_ID", 
-      "AWS_SECRET_ACCESS_KEY"
+      "AWS_SECRET_ACCESS_KEY",
+      "KUBE_CONFIG_DATA",
     ]
 }
