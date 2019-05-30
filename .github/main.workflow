@@ -19,7 +19,7 @@ action "Deploy to EKS" {
     ]
   runs = "sh -l -c"
   args = [
-      "apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml -n monitoring"
+      "kubectl apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml -n monitoring"
     ]
   secrets = [
       "KUBE_CONFIG_DATA",
@@ -32,7 +32,7 @@ action "Verify Manifests Deployment" {
       "Deploy to EKS"
     ]
   args = [
-      "rollout status deployment/prometheus-operator -n monitoring"
+      "kubectl get pods -n monitoring"
     ]
   secrets = [
       "KUBE_CONFIG_DATA",
