@@ -22,7 +22,9 @@ action "Deploy to EKS" {
       "kubectl apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml -n monitoring"
     ]
   secrets = [
-      "KUBE_CONFIG_DATA",
+      "AWS_ACCESS_KEY_ID",
+      "AWS_SECRET_ACCESS_KEY",
+      "KUBE_CONFIG_DATA"
     ]
 }
 
@@ -35,6 +37,8 @@ action "Verify Manifests Deployment" {
       "kubectl get pods -n monitoring"
     ]
   secrets = [
+      "AWS_ACCESS_KEY_ID",
+      "AWS_SECRET_ACCESS_KEY"
       "KUBE_CONFIG_DATA",
     ]
 }
