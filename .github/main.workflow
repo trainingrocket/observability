@@ -52,7 +52,7 @@ action "Verify EKS Deployment" {
       "Deploy to EKS"
     ]
   args = [
-      "rollout status deployment/prometheus-operator"
+      "kubectl get pod -n monitoring"
     ]
   secrets = [
       "AWS_ACCESS_KEY_ID", 
