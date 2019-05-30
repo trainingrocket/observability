@@ -37,7 +37,7 @@ action "Deploy to EKS" {
   ]
   runs = "sh -l -c"
   args = [
-      "kubectl apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml -n monitoring"
+      "kubectl apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml"
   ]
   secrets = [
       "AWS_ACCESS_KEY_ID",
