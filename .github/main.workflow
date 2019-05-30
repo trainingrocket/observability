@@ -1,7 +1,7 @@
 workflow "Build and Deploy" {
   on = "push"
   resolves = [
-      "Verify EKS Deployment"
+      "Verify Manifests Deployment"
     ]
 }
 
