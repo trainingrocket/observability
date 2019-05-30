@@ -5,21 +5,8 @@ workflow "Build and Deploy" {
     ]
 }
 
-action "Build Docker Image" {
-  uses = "actions/docker/cli@master"
-  args = [
-      "build", 
-      "--tag", 
-      "aws-example", 
-      "."
-    ]
-}
-
 action "Branch Filter" {
   uses = "actions/bin/filter@master"
-  needs = [
-        "Build Docker Image"
-    ]
   args = [
       "branch master"
     ]
