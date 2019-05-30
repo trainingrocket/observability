@@ -12,36 +12,16 @@ action "Branch Filter" {
     ]
 }
 
-action "Configure Cluster Credentials" {
-  uses = "actions/aws/cli@master"
-  needs = [
-      "Branch Filter"
-   ]
-  args = [
-      "eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_DEFAULT_REGION"
-   ]
-  env = {
-    CLUSTER_NAME = "mooplayground"
-    AWS_DEFAULT_REGION = "us-west-2"
-   }
-  secrets = [ 
-      "AWS_ACCESS_KEY_ID", 
-      "AWS_SECRET_ACCESS_KEY"
-  ]
-}
-
 action "Deploy to EKS" {
   uses = "actions/aws/kubectl@master"
   needs = [
-      "Configure Cluster Credentials"
+      "Branch Filter"
     ]
   runs = "sh -l -c"
   args = [
-      "kubectl apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml -n monitoring"
+      "apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/prometheus-operator.yaml -n monitoring"
     ]
   secrets = [
-      "AWS_ACCESS_KEY_ID", 
-      "AWS_SECRET_ACCESS_KEY",
       "KUBE_CONFIG_DATA",
     ]
 }
@@ -52,11 +32,9 @@ action "Verify EKS Deployment" {
       "Deploy to EKS"
     ]
   args = [
-      "kubectl get pod -n monitoring"
+      "rollout status deployment/prometheus-operator -n monitoring"
     ]
   secrets = [
-      "AWS_ACCESS_KEY_ID", 
-      "AWS_SECRET_ACCESS_KEY",
       "KUBE_CONFIG_DATA",
     ]
 }
