@@ -37,7 +37,7 @@ action "Deploy to EKS" {
   ]
   runs = "sh -l -c"
   args = [
-      "kubectl config set-context --current --namespace=monitoring"
+      "kubectl config set-context --current --namespace=monitoring",
       "kubectl apply -f $GITHUB_WORKSPACE/mooplayground/prometheus-operator/"
   ]
   secrets = [
