@@ -1,7 +1,7 @@
 workflow "Build and Deploy" {
   on = "push"
   resolves = [
-      "Verify EKS Deployment"
+      "Verify Manifests Deployment"
     ]
 }
 
@@ -26,7 +26,7 @@ action "Deploy to EKS" {
     ]
 }
 
-action "Verify EKS Deployment" {
+action "Verify Manifests Deployment" {
   uses = "actions/aws/kubectl@master"
   needs = [
       "Deploy to EKS"
