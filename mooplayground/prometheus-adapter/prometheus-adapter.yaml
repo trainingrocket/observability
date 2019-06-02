@@ -12,23 +12,6 @@ metadata:
   labels:
     app: prometheus-adapter
     release: prometheus-adapter
-  name: prometheus-adapter-external-metrics
-rules:
-- apiGroups:
-  - external.metrics.k8s.io
-  resources:
-  - '*'
-  verbs:
-  - list
-  - get
-  - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app: prometheus-adapter
-    release: prometheus-adapter
   name: prometheus-adapter-resource-reader
 rules:
 - apiGroups:
@@ -72,22 +55,6 @@ subjects:
 - kind: ServiceAccount
   name: prometheus-adapter
   namespace: monitoring
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app: prometheus-adapter
-    release: prometheus-adapter
-  name: prometheus-adapter-hpa-controller-external-metrics
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: prometheus-adapter-external-metrics
-subjects:
-- kind: ServiceAccount
-  name: horizontal-pod-autoscaler
-  namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -248,10 +215,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 55881a3a575cca96cad58304be653509ad07594bd933e4ad59a4b6abf7804a11
+        checksum/config: 3c78854a4cdf2dc7ddc1b22971a8fd11db7d44507fc39c7f7e8858d78b4a42b6
       labels:
         app: prometheus-adapter
-        chart: prometheus-adapter-1.0.2
+        chart: prometheus-adapter-1.0.3
         heritage: Tiller
         release: prometheus-adapter
       name: prometheus-adapter
@@ -318,31 +285,12 @@ kind: APIService
 metadata:
   labels:
     app: prometheus-adapter
-    chart: prometheus-adapter-1.0.2
+    chart: prometheus-adapter-1.0.3
     heritage: Tiller
     release: prometheus-adapter
   name: v1beta1.custom.metrics.k8s.io
 spec:
   group: custom.metrics.k8s.io
-  groupPriorityMinimum: 100
-  insecureSkipTLSVerify: true
-  service:
-    name: prometheus-adapter
-    namespace: monitoring
-  version: v1beta1
-  versionPriority: 100
----
-apiVersion: apiregistration.k8s.io/v1beta1
-kind: APIService
-metadata:
-  labels:
-    app: prometheus-adapter
-    chart: prometheus-adapter-1.0.2
-    heritage: Tiller
-    release: prometheus-adapter
-  name: v1beta1.external.metrics.k8s.io
-spec:
-  group: external.metrics.k8s.io
   groupPriorityMinimum: 100
   insecureSkipTLSVerify: true
   service:
