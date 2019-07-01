@@ -1,1 +1,1 @@
-# sre-kubernetes-observability
+# Observability
