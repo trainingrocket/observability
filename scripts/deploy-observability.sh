@@ -18,3 +18,17 @@ set -o errexit
 set -o nounset
 set -o pipefail
 set -o xtrace
+
+CLUSTER=${CLUSTER:-mooplayground}
+
+main() {
+    kubectl apply -f ${CLUSTER}/
+    kubectl apply -f ${CLUSTER}/
+    kubectl apply -f ${CLUSTER}/
+    kubectl apply -f ${CLUSTER}/
+    kubectl apply -f ${CLUSTER}/
+    kubectl apply -f ${CLUSTER}/
+    kubectl apply -f ${CLUSTER}/
+    kubectl apply -f ${CLUSTER}/
+
+main
