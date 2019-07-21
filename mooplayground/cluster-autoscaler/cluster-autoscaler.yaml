@@ -133,6 +133,13 @@ rules:
   - list
   - get
 - apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - watch
+- apiGroups:
   - extensions
   resourceNames:
   - privileged-cluster-autoscaler-aws-cluster-autoscaler
