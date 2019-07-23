@@ -1,3 +1,0 @@
-[submodule "scripts/cadvisor"]
-	path = scripts/cadvisor
-	url = https://github.com/google/cadvisor.git
