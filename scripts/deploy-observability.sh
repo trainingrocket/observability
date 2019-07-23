@@ -22,13 +22,11 @@ set -o xtrace
 CLUSTER=${CLUSTER:-mooplayground}
 
 main() {
-    kubectl apply -f ${CLUSTER}/
-    kubectl apply -f ${CLUSTER}/
-    kubectl apply -f ${CLUSTER}/
-    kubectl apply -f ${CLUSTER}/
-    kubectl apply -f ${CLUSTER}/
-    kubectl apply -f ${CLUSTER}/
-    kubectl apply -f ${CLUSTER}/
-    kubectl apply -f ${CLUSTER}/
+    kubectl create namespace monitoring
+    kubectl apply -f ${CLUSTER}/metrics-server/*
+    kubectl apply -f ${CLUSTER}/cluster-autoscaler/*
+    kubectl apply -f -n monitoring ${CLUSTER}/prometheus-operator/*
+    kubectl apply -f -n monitoring ${CLUSTER}/promethues-adapter/*
+    kubectl apply -f -n monitoring ${CLUSTER}/helm-exporter/*
 
 main
