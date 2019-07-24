@@ -224,7 +224,7 @@ spec:
         - ./cluster-autoscaler
         - --cloud-provider=aws
         - --namespace=kube-system
-        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,kubernetes.io/cluster/moo
+        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster/moo
         - --logtostderr=true
         - --scale-down-utilization-threshold=1.5
         - --stderrthreshold=info
