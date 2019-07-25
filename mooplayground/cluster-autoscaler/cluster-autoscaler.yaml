@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-2.0.0
+    helm.sh/chart: cluster-autoscaler-3.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -15,7 +15,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-2.0.0
+    helm.sh/chart: cluster-autoscaler-3.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
 - apiGroups:
@@ -42,7 +42,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-2.0.0
+    helm.sh/chart: cluster-autoscaler-3.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
 - apiGroups:
@@ -148,7 +148,7 @@ rules:
 - apiGroups:
   - extensions
   resourceNames:
-  - privileged-cluster-autoscaler-aws-cluster-autoscaler
+  - cluster-autoscaler-aws-cluster-autoscaler
   resources:
   - podsecuritypolicies
   verbs:
@@ -161,7 +161,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-2.0.0
+    helm.sh/chart: cluster-autoscaler-3.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -179,7 +179,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-2.0.0
+    helm.sh/chart: cluster-autoscaler-3.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -197,7 +197,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-2.0.0
+    helm.sh/chart: cluster-autoscaler-3.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   ports:
@@ -217,7 +217,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-2.0.0
+    helm.sh/chart: cluster-autoscaler-3.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   replicas: 1
@@ -280,7 +280,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-2.0.0
+    helm.sh/chart: cluster-autoscaler-3.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   maxUnavailable: 1
@@ -292,24 +292,38 @@ spec:
 apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: privileged-cluster-autoscaler-aws-cluster-autoscaler
+  labels:
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.0.0
+  name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
-  allowedCapabilities:
-  - '*'
+  allowPrivilegeEscalation: false
+  allowedHostPaths:
+  - pathPrefix: /etc/ssl/certs/ca-certificates.crt
   fsGroup:
-    rule: RunAsAny
-  hostIPC: true
-  hostNetwork: true
-  hostPID: true
-  hostPorts:
-  - max: 65536
-    min: 1
-  privileged: true
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  readOnlyRootFilesystem: false
+  requiredDropCapabilities:
+  - ALL
   runAsUser:
     rule: RunAsAny
   seLinux:
     rule: RunAsAny
   supplementalGroups:
-    rule: RunAsAny
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
   volumes:
-  - '*'
+  - configMap
+  - secret
+  - hostPath
