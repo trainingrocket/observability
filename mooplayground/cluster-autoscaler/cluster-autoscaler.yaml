@@ -133,6 +133,13 @@ rules:
   - list
   - get
 - apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - watch
+- apiGroups:
   - extensions
   resourceNames:
   - privileged-cluster-autoscaler-aws-cluster-autoscaler
@@ -172,14 +179,6 @@ subjects:
 - kind: ServiceAccount
   name: cluster-autoscaler-aws-cluster-autoscaler
   namespace: kube-system
----
-apiVersion: v1
-data:
-  AwsAccessKeyId: ""
-  AwsSecretAccessKey: ""
-kind: Secret
-metadata:
-  name: cluster-autoscaler-aws-cluster-autoscaler
 ---
 apiVersion: v1
 kind: Service
@@ -225,7 +224,7 @@ spec:
         - ./cluster-autoscaler
         - --cloud-provider=aws
         - --namespace=kube-system
-        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,kubernetes.io/cluster/mooplayground
+        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster/mooplayground
         - --logtostderr=true
         - --scale-down-utilization-threshold=1.5
         - --stderrthreshold=info
