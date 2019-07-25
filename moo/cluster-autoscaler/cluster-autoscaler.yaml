@@ -2,16 +2,20 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-2.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-2.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
 - apiGroups:
@@ -35,8 +39,10 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-2.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
 - apiGroups:
@@ -152,8 +158,10 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-2.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -168,8 +176,10 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-2.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -184,8 +194,10 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-2.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   ports:
@@ -194,30 +206,32 @@ spec:
     protocol: TCP
     targetPort: 8085
   selector:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/name: aws-cluster-autoscaler
   type: ClusterIP
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-2.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aws-cluster-autoscaler
-      release: cluster-autoscaler
+      app.kubernetes.io/instance: cluster-autoscaler
+      app.kubernetes.io/name: aws-cluster-autoscaler
   template:
     metadata:
       annotations:
         iam.amazonaws.com/role: moo-cluster-autoscaler
       labels:
-        app: aws-cluster-autoscaler
-        release: cluster-autoscaler
+        app.kubernetes.io/instance: cluster-autoscaler
+        app.kubernetes.io/name: aws-cluster-autoscaler
     spec:
       containers:
       - command:
@@ -263,15 +277,17 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-2.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: aws-cluster-autoscaler
-      release: cluster-autoscaler
+      app.kubernetes.io/instance: cluster-autoscaler
+      app.kubernetes.io/name: aws-cluster-autoscaler
 ---
 apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
