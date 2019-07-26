@@ -24,9 +24,9 @@ CLUSTER=${CLUSTER:-mooplayground}
 main() {
     kubectl apply -f ${CLUSTER}/metrics-server/*
     kubectl apply -f ${CLUSTER}/cluster-autoscaler/*
-    kubectl apply -f -n monitoring ${CLUSTER}/prometheus-operator/*
-    kubectl apply -f -n monitoring ${CLUSTER}/promethues-adapter/*
-    kubectl apply -f -n monitoring ${CLUSTER}/helm-exporter/*
+    kubectl apply -n monitoring -f  ${CLUSTER}/prometheus-operator/*
+    kubectl apply -n monitoring -f  ${CLUSTER}/promethues-adapter/*
+    kubectl apply -n monitoring -f  ${CLUSTER}/helm-exporter/*
 }
 
 main
