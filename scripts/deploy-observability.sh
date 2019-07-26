@@ -27,5 +27,6 @@ main() {
     kubectl apply -f -n monitoring ${CLUSTER}/prometheus-operator/*
     kubectl apply -f -n monitoring ${CLUSTER}/promethues-adapter/*
     kubectl apply -f -n monitoring ${CLUSTER}/helm-exporter/*
+}
 
 main
