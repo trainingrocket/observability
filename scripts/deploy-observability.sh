@@ -22,6 +22,7 @@ set -o xtrace
 CLUSTER=${CLUSTER:-mooplayground}
 
 main() {
+    aws eks update-kubeconfig --name mooplayground
     kubectl config set-context --current --namespace=monitoring
     kubectl apply -n kube-system -f ${CLUSTER}/metrics-server/*
     kubectl apply -n kube-system -f ${CLUSTER}/cluster-autoscaler/*
