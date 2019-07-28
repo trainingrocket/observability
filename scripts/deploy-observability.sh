@@ -22,10 +22,13 @@ set -o xtrace
 CLUSTER=${CLUSTER:-mooplayground}
 
 main() {
-    kubectl apply -f ${CLUSTER}/metrics-server/*
-    kubectl apply -f ${CLUSTER}/cluster-autoscaler/*
-    kubectl apply -f -n monitoring ${CLUSTER}/prometheus-operator/*
-    kubectl apply -f -n monitoring ${CLUSTER}/promethues-adapter/*
-    kubectl apply -f -n monitoring ${CLUSTER}/helm-exporter/*
+    aws eks update-kubeconfig --name mooplayground
+    kubectl config set-context --current --namespace=monitoring
+    kubectl apply -n kube-system -f ${CLUSTER}/metrics-server/*
+    kubectl apply -n kube-system -f ${CLUSTER}/cluster-autoscaler/*
+    kubectl apply -f  ${CLUSTER}/prometheus-operator/*
+    kubectl apply -f  ${CLUSTER}/prometheus-adapter/*
+    kubectl apply -f  ${CLUSTER}/helm-exporter/*
+}
 
 main
