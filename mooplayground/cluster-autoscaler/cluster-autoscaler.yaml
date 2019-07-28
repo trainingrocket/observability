@@ -2,16 +2,20 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
 - apiGroups:
@@ -35,8 +39,10 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
 - apiGroups:
@@ -142,7 +148,7 @@ rules:
 - apiGroups:
   - extensions
   resourceNames:
-  - privileged-cluster-autoscaler-aws-cluster-autoscaler
+  - cluster-autoscaler-aws-cluster-autoscaler
   resources:
   - podsecuritypolicies
   verbs:
@@ -152,8 +158,10 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -168,8 +176,10 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -184,8 +194,10 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   ports:
@@ -194,37 +206,39 @@ spec:
     protocol: TCP
     targetPort: 8085
   selector:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/name: aws-cluster-autoscaler
   type: ClusterIP
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aws-cluster-autoscaler
-      release: cluster-autoscaler
+      app.kubernetes.io/instance: cluster-autoscaler
+      app.kubernetes.io/name: aws-cluster-autoscaler
   template:
     metadata:
       annotations:
         iam.amazonaws.com/role: mooplayground-cluster-autoscaler
       labels:
-        app: aws-cluster-autoscaler
-        release: cluster-autoscaler
+        app.kubernetes.io/instance: cluster-autoscaler
+        app.kubernetes.io/name: aws-cluster-autoscaler
     spec:
       containers:
       - command:
         - ./cluster-autoscaler
         - --cloud-provider=aws
         - --namespace=kube-system
-        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster/mooplayground
+        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/mooplayground
         - --logtostderr=true
         - --scale-down-utilization-threshold=1.5
         - --stderrthreshold=info
@@ -263,37 +277,53 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   labels:
-    app: aws-cluster-autoscaler
-    release: cluster-autoscaler
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: aws-cluster-autoscaler
-      release: cluster-autoscaler
+      app.kubernetes.io/instance: cluster-autoscaler
+      app.kubernetes.io/name: aws-cluster-autoscaler
 ---
 apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: privileged-cluster-autoscaler-aws-cluster-autoscaler
+  labels:
+    app.kubernetes.io/instance: cluster-autoscaler
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: aws-cluster-autoscaler
+    helm.sh/chart: cluster-autoscaler-3.1.0
+  name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
-  allowedCapabilities:
-  - '*'
+  allowPrivilegeEscalation: false
+  allowedHostPaths:
+  - pathPrefix: /etc/ssl/certs/ca-certificates.crt
   fsGroup:
-    rule: RunAsAny
-  hostIPC: true
-  hostNetwork: true
-  hostPID: true
-  hostPorts:
-  - max: 65536
-    min: 1
-  privileged: true
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  readOnlyRootFilesystem: false
+  requiredDropCapabilities:
+  - ALL
   runAsUser:
     rule: RunAsAny
   seLinux:
     rule: RunAsAny
   supplementalGroups:
-    rule: RunAsAny
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
   volumes:
-  - '*'
+  - configMap
+  - secret
+  - hostPath
