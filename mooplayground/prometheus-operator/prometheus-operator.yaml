@@ -6,7 +6,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: alertmanagers.monitoring.coreos.com
@@ -1550,7 +1550,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: podmonitors.monitoring.coreos.com
@@ -1736,7 +1736,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheuses.monitoring.coreos.com
@@ -4108,7 +4108,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheusrules.monitoring.coreos.com
@@ -4395,7 +4395,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: servicemonitors.monitoring.coreos.com
@@ -4634,6 +4634,58 @@ spec:
       type: object
   version: v1
 ---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
+webhooks:
+- clientConfig:
+    service:
+      name: prometheus-operator-operator
+      namespace: monitoring
+      path: /admission-prometheusrules/mutate
+  failurePolicy: Ignore
+  name: prometheusrulemutate.monitoring.coreos.com
+  rules:
+  - apiGroups:
+    - monitoring.coreos.com
+    apiVersions:
+    - '*'
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - prometheusrules
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
+webhooks:
+- clientConfig:
+    service:
+      name: prometheus-operator-operator
+      namespace: monitoring
+      path: /admission-prometheusrules/validate
+  failurePolicy: Ignore
+  name: prometheusrulemutate.monitoring.coreos.com
+  rules:
+  - apiGroups:
+    - monitoring.coreos.com
+    apiVersions:
+    - '*'
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - prometheusrules
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -4642,6 +4694,17 @@ metadata:
     release: prometheus-operator
   name: prometheus-operator-grafana
   namespace: monitoring
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
 ---
 apiVersion: v1
 imagePullSecrets: []
@@ -4701,6 +4764,25 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
   labels:
     app: grafana
     release: prometheus-operator
@@ -4732,6 +4814,26 @@ rules:
   - podsecuritypolicies
   verbs:
   - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
+rules:
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  - mutatingwebhookconfigurations
+  verbs:
+  - get
+  - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -4809,6 +4911,7 @@ rules:
   - servicemonitors
   - podmonitors
   - prometheusrules
+  - podmonitors
   verbs:
   - '*'
 - apiGroups:
@@ -5124,6 +5227,25 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prometheus-operator-admission
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator-admission
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
   labels:
     app: grafana
     release: prometheus-operator
@@ -5152,6 +5274,25 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-grafana
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-operator-admission
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator-admission
   namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -18727,6 +18868,9 @@ spec:
   - name: http
     port: 8080
     targetPort: http
+  - name: https
+    port: 443
+    targetPort: https
   selector:
     app: prometheus-operator-operator
     release: prometheus-operator
@@ -18849,7 +18993,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-operator
-        chart: prometheus-operator-6.2.1
+        chart: prometheus-operator-6.3.0
         heritage: Tiller
         release: prometheus-operator
     spec:
@@ -18871,10 +19015,35 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
+      - args:
+        - server
+        - --listen=:8443
+        - --target=127.0.0.1:8080
+        - --key=cert/key
+        - --cert=cert/cert
+        - --disable-authentication
+        image: squareup/ghostunnel:v1.4.1
+        imagePullPolicy: IfNotPresent
+        name: tls-proxy
+        ports:
+        - containerPort: 8443
+          name: https
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /cert
+          name: tls-proxy-secret
+          readOnly: true
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: prometheus-operator-operator
+      volumes:
+      - name: tls-proxy-secret
+        secret:
+          defaultMode: 420
+          secretName: prometheus-operator-admission
 ---
 apiVersion: apps/v1beta2
 kind: Deployment
@@ -19007,6 +19176,79 @@ spec:
         name: sc-dashboard-provider
       - emptyDir: {}
         name: sc-datasources-volume
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission-create
+    release: prometheus-operator
+  name: prometheus-operator-admission-create
+spec:
+  template:
+    metadata:
+      labels:
+        app: prometheus-operator-admission-create
+        chart: prometheus-operator-6.3.0
+        heritage: Tiller
+        release: prometheus-operator
+      name: prometheus-operator-admission-create
+    spec:
+      containers:
+      - args:
+        - create
+        - --host=prometheus-operator-operator,prometheus-operator-operator.monitoring.svc
+        - --namespace=monitoring
+        - --secret-name=prometheus-operator-admission
+        image: jettech/kube-webhook-certgen:v1.0.0
+        imagePullPolicy: null
+        name: create
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 2000
+      serviceAccountName: prometheus-operator-admission
+  ttlSecondsAfterFinished: 0
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission-patch
+    release: prometheus-operator
+  name: prometheus-operator-admission-patch
+spec:
+  template:
+    metadata:
+      labels:
+        app: prometheus-operator-admission-patch
+        chart: prometheus-operator-6.3.0
+        heritage: Tiller
+        release: prometheus-operator
+      name: prometheus-operator-admission-patch
+    spec:
+      containers:
+      - args:
+        - patch
+        - --webhook-name=prometheus-operator-admission
+        - --namespace=monitoring
+        - --secret-name=prometheus-operator-admission
+        - --patch-failure-policy=Fail
+        image: jettech/kube-webhook-certgen:v1.0.0
+        imagePullPolicy: null
+        name: patch
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 2000
+      serviceAccountName: prometheus-operator-admission
+  ttlSecondsAfterFinished: 0
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -19282,7 +19524,7 @@ kind: Alertmanager
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -19308,7 +19550,7 @@ kind: Prometheus
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -19350,7 +19592,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager.rules
@@ -19388,7 +19630,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-etcd
@@ -19515,7 +19757,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-general.rules
@@ -19547,7 +19789,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-k8s.rules
@@ -19631,7 +19873,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-apiserver.rules
@@ -19657,7 +19899,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-prometheus-node-alerting.rules
@@ -19685,7 +19927,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-prometheus-node-recording.rules
@@ -19713,7 +19955,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler.rules
@@ -19763,7 +20005,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-absent
@@ -19849,7 +20091,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-apps
@@ -19996,7 +20238,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-resources
@@ -20086,7 +20328,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-storage
@@ -20135,7 +20377,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubernetes-system
@@ -20267,7 +20509,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-network
@@ -20302,7 +20544,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-time
@@ -20323,7 +20565,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node.rules
@@ -20512,7 +20754,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus-operator
@@ -20540,7 +20782,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app: prometheus-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus.rules
@@ -20634,7 +20876,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: ark-metrics
@@ -20666,7 +20908,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: helm-exporter
@@ -20698,7 +20940,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: nginx-ingress-controller-metrics
@@ -20730,7 +20972,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -20751,7 +20993,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-apiserver
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-apiserver
@@ -20778,7 +21020,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-coredns
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-coredns
@@ -20800,7 +21042,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-grafana
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-grafana
@@ -20821,7 +21063,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-controller-manager
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-controller-manager
@@ -20843,7 +21085,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-etcd
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-etcd
@@ -20865,7 +21107,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-proxy
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-proxy
@@ -20887,7 +21129,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-scheduler
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler
@@ -20909,7 +21151,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-state-metrics
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-state-metrics
@@ -20928,7 +21170,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kubelet
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubelet
@@ -20962,7 +21204,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-node-exporter
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-exporter
@@ -20980,7 +21222,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-operator
@@ -21001,7 +21243,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.2.1
+    chart: prometheus-operator-6.3.0
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
