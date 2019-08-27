@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/instance: helm-exporter
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: helm-exporter
-    helm.sh/chart: helm-exporter-0.3.0
+    helm.sh/chart: helm-exporter-0.3.1
   name: helm-exporter
 ---
 apiVersion: v1
@@ -15,7 +15,7 @@ metadata:
     app.kubernetes.io/instance: helm-exporter
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: helm-exporter
-    helm.sh/chart: helm-exporter-0.3.0
+    helm.sh/chart: helm-exporter-0.3.1
   name: helm-exporter
 spec:
   clusterIP: None
@@ -36,7 +36,7 @@ metadata:
     app.kubernetes.io/instance: helm-exporter
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: helm-exporter
-    helm.sh/chart: helm-exporter-0.3.0
+    helm.sh/chart: helm-exporter-0.3.1
   name: helm-exporter
 spec:
   replicas: 1
@@ -51,7 +51,7 @@ spec:
         app.kubernetes.io/name: helm-exporter
     spec:
       containers:
-      - image: sstarcher/helm-exporter:0.4.0
+      - image: sstarcher/helm-exporter:0.4.2
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -82,7 +82,7 @@ metadata:
     app.kubernetes.io/instance: helm-exporter
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: helm-exporter
-    helm.sh/chart: helm-exporter-0.3.0
+    helm.sh/chart: helm-exporter-0.3.1
   name: helm-exporter
   namespace: monitoring
 spec:
