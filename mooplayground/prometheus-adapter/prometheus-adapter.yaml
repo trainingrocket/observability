@@ -215,14 +215,15 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 5b838a28be6f82ee1f05cbde24b5c31a9cf38758b2f23b84443d7657d85936e6
+        checksum/config: 0e9a92be2bd275bbd4acd8248f0ecd3046a829121ec0ed427bc91716c7d85fb8
       labels:
         app: prometheus-adapter
-        chart: prometheus-adapter-1.1.0
+        chart: prometheus-adapter-1.3.0
         heritage: Tiller
         release: prometheus-adapter
       name: prometheus-adapter
     spec:
+      affinity: {}
       containers:
       - args:
         - /adapter
@@ -272,7 +273,10 @@ spec:
           readOnly: true
         - mountPath: /tmp
           name: tmp
+      nodeSelector: {}
+      priorityClassName: null
       serviceAccountName: prometheus-adapter
+      tolerations: []
       volumes:
       - configMap:
           name: prometheus-adapter
@@ -285,7 +289,7 @@ kind: APIService
 metadata:
   labels:
     app: prometheus-adapter
-    chart: prometheus-adapter-1.1.0
+    chart: prometheus-adapter-1.3.0
     heritage: Tiller
     release: prometheus-adapter
   name: v1beta1.custom.metrics.k8s.io
