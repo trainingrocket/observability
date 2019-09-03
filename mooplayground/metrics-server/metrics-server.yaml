@@ -21,6 +21,7 @@ rules:
   - metrics.k8s.io
   resources:
   - pods
+  - nodes
   verbs:
   - get
   - list
@@ -40,6 +41,7 @@ rules:
   - pods
   - nodes
   - nodes/stats
+  - namespaces
   verbs:
   - get
   - list
@@ -196,7 +198,7 @@ kind: APIService
 metadata:
   labels:
     app: metrics-server
-    chart: metrics-server-2.8.1
+    chart: metrics-server-2.8.4
     heritage: Tiller
     release: metrics-server
   name: v1beta1.metrics.k8s.io
