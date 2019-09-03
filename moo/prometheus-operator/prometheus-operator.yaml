@@ -5992,6 +5992,20 @@ spec:
         - mountPath: /etc/grafana/provisioning/datasources
           name: sc-datasources-volume
       initContainers:
+      - command:
+        - chown
+        - -R
+        - 472:472
+        - /var/lib/grafana
+        image: busybox:1.30
+        imagePullPolicy: IfNotPresent
+        name: init-chown-data
+        resources: {}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: storage
       - env:
         - name: METHOD
           value: LIST
@@ -6022,8 +6036,9 @@ spec:
           - key: ldap-toml
             path: ldap.toml
           secretName: prometheus-operator-grafana
-      - emptyDir: {}
-        name: storage
+      - name: storage
+        persistentVolumeClaim:
+          claimName: prometheus-operator-grafana
       - emptyDir: {}
         name: sc-dashboard-volume
       - configMap:
@@ -7004,6 +7019,24 @@ spec:
   - secret
   - downwardAPI
   - persistentVolumeClaim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app: grafana
+    release: prometheus-operator
+  name: prometheus-operator-grafana
+  namespace: monitoring
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: null
 ---
 apiVersion: v1
 kind: Pod
