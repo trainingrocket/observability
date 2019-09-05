@@ -5487,6 +5487,15 @@ data:
     logs = /var/log/grafana
     plugins = /var/lib/grafana/plugins
     provisioning = /etc/grafana/provisioning
+    [auth.generic_oauth]
+    name = Okta
+    enabled = true
+    scopes = openid profile email
+    client_id = 0oa1favfuryGWvJsM1d8
+    client_secret = Drc5rXtQuB4gtTvrhCHWDI5cNJHAJpDGMoo4aaYZ
+    auth_url = https://servicerocket.okta.com/oauth2/v1/authorize
+    token_url = https://servicerocket.okta.com/oauth2/v1/token
+    api_url = https://servicerocket.okta.com/oauth2/v1/userinfo
 kind: ConfigMap
 metadata:
   labels:
