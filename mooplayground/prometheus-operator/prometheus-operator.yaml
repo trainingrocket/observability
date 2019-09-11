@@ -6211,7 +6211,7 @@ metadata:
   annotations:
     certmanager.k8s.io/cluster-issuer: ca-issuer-ent-yardrat-org
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/force-ssl-redirect: true
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/whitelist-source-range: 66.201.42.194/32,135.84.144.214/32,216.241.29.130/32,210.19.86.66/32,175.143.105.73/32,220.233.129.3/32,59.167.165.193/32
   labels:
     app: grafana
@@ -6238,7 +6238,7 @@ metadata:
   annotations:
     certmanager.k8s.io/cluster-issuer: ca-issuer-ent-yardrat-org
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/force-ssl-redirect: true
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/whitelist-source-range: 66.201.42.194/32,135.84.144.214/32,216.241.29.130/32,210.19.86.66/32,175.143.105.73/32,220.233.129.3/32,59.167.165.193/32
   labels:
     app: prometheus-operator-alertmanager
@@ -6264,7 +6264,7 @@ metadata:
   annotations:
     certmanager.k8s.io/cluster-issuer: ca-issuer-ent-yardrat-org
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/force-ssl-redirect: true
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/whitelist-source-range: 66.201.42.194/32,135.84.144.214/32,216.241.29.130/32,210.19.86.66/32,175.143.105.73/32,220.233.129.3/32,59.167.165.193/32
   labels:
     app: prometheus-operator-prometheus
