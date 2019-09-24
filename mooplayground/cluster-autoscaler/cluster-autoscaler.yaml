@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -15,7 +15,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
 - apiGroups:
@@ -42,7 +42,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 rules:
 - apiGroups:
@@ -161,7 +161,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -179,7 +179,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -197,7 +197,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   ports:
@@ -217,7 +217,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   replicas: 1
@@ -262,16 +262,8 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
-        volumeMounts:
-        - mountPath: /etc/ssl/certs/ca-bundle.crt
-          name: ssl-certs
-          readOnly: true
       serviceAccountName: cluster-autoscaler-aws-cluster-autoscaler
       tolerations: []
-      volumes:
-      - hostPath:
-          path: /etc/ssl/certs/ca-certificates.crt
-        name: ssl-certs
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -280,7 +272,7 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   maxUnavailable: 1
@@ -296,12 +288,10 @@ metadata:
     app.kubernetes.io/instance: cluster-autoscaler
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: aws-cluster-autoscaler
-    helm.sh/chart: cluster-autoscaler-3.4.0
+    helm.sh/chart: cluster-autoscaler-4.0.0
   name: cluster-autoscaler-aws-cluster-autoscaler
 spec:
   allowPrivilegeEscalation: false
-  allowedHostPaths:
-  - pathPrefix: /etc/ssl/certs/ca-certificates.crt
   fsGroup:
     ranges:
     - max: 65535
