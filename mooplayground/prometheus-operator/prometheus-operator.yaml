@@ -4646,6 +4646,7 @@ metadata:
   name: prometheus-operator-admission
 webhooks:
 - clientConfig:
+    caBundle: ""
     service:
       name: prometheus-operator-operator
       namespace: monitoring
@@ -4672,6 +4673,7 @@ metadata:
   name: prometheus-operator-admission
 webhooks:
 - clientConfig:
+    caBundle: ""
     service:
       name: prometheus-operator-operator
       namespace: monitoring
@@ -5793,6 +5795,153 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: grafana
+    release: prometheus-operator
+  name: prometheus-operator-grafana
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+      release: prometheus-operator
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: efe2869ed3493ded05fb717a41e0c3e0c44fa0e53817034fe2c95386582eb4f2
+        checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/sc-dashboard-provider-config: 4d924f6ad3cf72460e577fa648717ee9306bd074135d08f8f54af701c9cf12e8
+        checksum/secret: 6ea44c50907d37fe00034819c10ce12cabd76a993a9c6ea3e57855cd923274f7
+      labels:
+        app: grafana
+        release: prometheus-operator
+    spec:
+      containers:
+      - env:
+        - name: LABEL
+          value: grafana_dashboard
+        - name: FOLDER
+          value: /tmp/dashboards
+        - name: RESOURCE
+          value: both
+        image: kiwigrid/k8s-sidecar:0.1.20
+        imagePullPolicy: IfNotPresent
+        name: grafana-sc-dashboard
+        resources: {}
+        volumeMounts:
+        - mountPath: /tmp/dashboards
+          name: sc-dashboard-volume
+      - env:
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              key: admin-user
+              name: prometheus-operator-grafana
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: admin-password
+              name: prometheus-operator-grafana
+        image: grafana/grafana:6.3.5
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          timeoutSeconds: 30
+        name: grafana
+        ports:
+        - containerPort: 80
+          name: service
+          protocol: TCP
+        - containerPort: 3000
+          name: grafana
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/grafana/grafana.ini
+          name: config
+          subPath: grafana.ini
+        - mountPath: /etc/grafana/ldap.toml
+          name: ldap
+          subPath: ldap.toml
+        - mountPath: /var/lib/grafana
+          name: storage
+        - mountPath: /tmp/dashboards
+          name: sc-dashboard-volume
+        - mountPath: /etc/grafana/provisioning/dashboards/sc-dashboardproviders.yaml
+          name: sc-dashboard-provider
+          subPath: provider.yaml
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: sc-datasources-volume
+      initContainers:
+      - command:
+        - chown
+        - -R
+        - 472:472
+        - /var/lib/grafana
+        image: busybox:1.30
+        imagePullPolicy: IfNotPresent
+        name: init-chown-data
+        resources: {}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: storage
+      - env:
+        - name: METHOD
+          value: LIST
+        - name: LABEL
+          value: grafana_datasource
+        - name: FOLDER
+          value: /etc/grafana/provisioning/datasources
+        - name: RESOURCE
+          value: both
+        image: kiwigrid/k8s-sidecar:0.1.20
+        imagePullPolicy: IfNotPresent
+        name: grafana-sc-datasources
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: sc-datasources-volume
+      securityContext:
+        fsGroup: 472
+        runAsUser: 472
+      serviceAccountName: prometheus-operator-grafana
+      volumes:
+      - configMap:
+          name: prometheus-operator-grafana
+        name: config
+      - name: ldap
+        secret:
+          items:
+          - key: ldap-toml
+            path: ldap.toml
+          secretName: prometheus-operator-grafana
+      - name: storage
+        persistentVolumeClaim:
+          claimName: prometheus-operator-grafana
+      - emptyDir: {}
+        name: sc-dashboard-volume
+      - configMap:
+          name: prometheus-operator-grafana-config-dashboards
+        name: sc-dashboard-provider
+      - emptyDir: {}
+        name: sc-datasources-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
@@ -5927,153 +6076,6 @@ spec:
           defaultMode: 420
           secretName: prometheus-operator-admission
 ---
-apiVersion: apps/v1beta2
-kind: Deployment
-metadata:
-  labels:
-    app: grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana
-  namespace: monitoring
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: grafana
-      release: prometheus-operator
-  strategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations:
-        checksum/config: e573a3cc63d6c8e227013856e90eea8aa8177ab442d1919057ba08a8bb716568
-        checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: 5911b582d753eba330e0e3d880fe8bf2e9262b461ef641fbee4c526b8527d2fa
-        checksum/secret: 459f51209fea57ae1c3bdbdc1e0fbd6049df2e99d12d3fb01015bfac9b789b04
-      labels:
-        app: grafana
-        release: prometheus-operator
-    spec:
-      containers:
-      - env:
-        - name: LABEL
-          value: grafana_dashboard
-        - name: FOLDER
-          value: /tmp/dashboards
-        - name: RESOURCE
-          value: both
-        image: kiwigrid/k8s-sidecar:0.1.20
-        imagePullPolicy: IfNotPresent
-        name: grafana-sc-dashboard
-        resources: {}
-        volumeMounts:
-        - mountPath: /tmp/dashboards
-          name: sc-dashboard-volume
-      - env:
-        - name: GF_SECURITY_ADMIN_USER
-          valueFrom:
-            secretKeyRef:
-              key: admin-user
-              name: prometheus-operator-grafana
-        - name: GF_SECURITY_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: admin-password
-              name: prometheus-operator-grafana
-        image: grafana/grafana:6.3.5
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          failureThreshold: 10
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 60
-          timeoutSeconds: 30
-        name: grafana
-        ports:
-        - containerPort: 80
-          name: service
-          protocol: TCP
-        - containerPort: 3000
-          name: grafana
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-        resources: {}
-        volumeMounts:
-        - mountPath: /etc/grafana/grafana.ini
-          name: config
-          subPath: grafana.ini
-        - mountPath: /etc/grafana/ldap.toml
-          name: ldap
-          subPath: ldap.toml
-        - mountPath: /var/lib/grafana
-          name: storage
-        - mountPath: /tmp/dashboards
-          name: sc-dashboard-volume
-        - mountPath: /etc/grafana/provisioning/dashboards/sc-dashboardproviders.yaml
-          name: sc-dashboard-provider
-          subPath: provider.yaml
-        - mountPath: /etc/grafana/provisioning/datasources
-          name: sc-datasources-volume
-      initContainers:
-      - command:
-        - chown
-        - -R
-        - 472:472
-        - /var/lib/grafana
-        image: busybox:1.30
-        imagePullPolicy: IfNotPresent
-        name: init-chown-data
-        resources: {}
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-        - mountPath: /var/lib/grafana
-          name: storage
-      - env:
-        - name: METHOD
-          value: LIST
-        - name: LABEL
-          value: grafana_datasource
-        - name: FOLDER
-          value: /etc/grafana/provisioning/datasources
-        - name: RESOURCE
-          value: both
-        image: kiwigrid/k8s-sidecar:0.1.20
-        imagePullPolicy: IfNotPresent
-        name: grafana-sc-datasources
-        resources: {}
-        volumeMounts:
-        - mountPath: /etc/grafana/provisioning/datasources
-          name: sc-datasources-volume
-      securityContext:
-        fsGroup: 472
-        runAsUser: 472
-      serviceAccountName: prometheus-operator-grafana
-      volumes:
-      - configMap:
-          name: prometheus-operator-grafana
-        name: config
-      - name: ldap
-        secret:
-          items:
-          - key: ldap-toml
-            path: ldap.toml
-          secretName: prometheus-operator-grafana
-      - name: storage
-        persistentVolumeClaim:
-          claimName: prometheus-operator-grafana
-      - emptyDir: {}
-        name: sc-dashboard-volume
-      - configMap:
-          name: prometheus-operator-grafana-config-dashboards
-        name: sc-dashboard-provider
-      - emptyDir: {}
-        name: sc-datasources-volume
----
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -6101,7 +6103,6 @@ spec:
         - --namespace=monitoring
         - --secret-name=prometheus-operator-admission
         image: jettech/kube-webhook-certgen:v1.0.0
-        imagePullPolicy: null
         name: create
       restartPolicy: OnFailure
       securityContext:
@@ -6138,7 +6139,6 @@ spec:
         - --secret-name=prometheus-operator-admission
         - --patch-failure-policy=Fail
         image: jettech/kube-webhook-certgen:v1.0.0
-        imagePullPolicy: null
         name: patch
       restartPolicy: OnFailure
       securityContext:
@@ -6298,83 +6298,6 @@ spec:
   - hosts:
     - prometheus.ent.yardrat.org
     secretName: prometheus-ent-ssl-certificate
----
-apiVersion: extensions/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  annotations:
-    apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
-    apparmor.security.beta.kubernetes.io/defaultProfileName: runtime/default
-    seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default
-    seccomp.security.alpha.kubernetes.io/defaultProfileName: docker/default
-  labels:
-    app: grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana
-  namespace: monitoring
-spec:
-  allowPrivilegeEscalation: false
-  fsGroup:
-    rule: RunAsAny
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  privileged: false
-  readOnlyRootFilesystem: false
-  requiredDropCapabilities:
-  - FOWNER
-  - FSETID
-  - KILL
-  - SETGID
-  - SETUID
-  - SETPCAP
-  - NET_BIND_SERVICE
-  - NET_RAW
-  - SYS_CHROOT
-  - MKNOD
-  - AUDIT_WRITE
-  - SETFCAP
-  runAsUser:
-    rule: RunAsAny
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    rule: RunAsAny
-  volumes:
-  - configMap
-  - emptyDir
-  - projected
-  - secret
-  - downwardAPI
-  - persistentVolumeClaim
----
-apiVersion: extensions/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  labels:
-    app: grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana-test
-spec:
-  allowPrivilegeEscalation: true
-  fsGroup:
-    rule: RunAsAny
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  privileged: false
-  runAsUser:
-    rule: RunAsAny
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    rule: RunAsAny
-  volumes:
-  - configMap
-  - downwardAPI
-  - emptyDir
-  - projected
-  - secret
 ---
 apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
@@ -6876,6 +6799,55 @@ apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   annotations:
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+    apparmor.security.beta.kubernetes.io/defaultProfileName: runtime/default
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: docker/default
+  labels:
+    app: grafana
+    release: prometheus-operator
+  name: prometheus-operator-grafana
+  namespace: monitoring
+spec:
+  allowPrivilegeEscalation: false
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  readOnlyRootFilesystem: false
+  requiredDropCapabilities:
+  - FOWNER
+  - FSETID
+  - KILL
+  - SETGID
+  - SETUID
+  - SETPCAP
+  - NET_BIND_SERVICE
+  - NET_RAW
+  - SYS_CHROOT
+  - MKNOD
+  - AUDIT_WRITE
+  - SETFCAP
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - emptyDir
+  - projected
+  - secret
+  - downwardAPI
+  - persistentVolumeClaim
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  annotations:
     helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
   labels:
@@ -6944,6 +6916,34 @@ spec:
   - secret
   - downwardAPI
   - persistentVolumeClaim
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app: grafana
+    release: prometheus-operator
+  name: prometheus-operator-grafana-test
+spec:
+  allowPrivilegeEscalation: true
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - projected
+  - secret
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
