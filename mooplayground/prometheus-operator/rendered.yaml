@@ -6,7 +6,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: alertmanagers.monitoring.coreos.com
@@ -1550,7 +1550,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: podmonitors.monitoring.coreos.com
@@ -1736,7 +1736,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheuses.monitoring.coreos.com
@@ -4111,7 +4111,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheusrules.monitoring.coreos.com
@@ -4398,7 +4398,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: servicemonitors.monitoring.coreos.com
@@ -4695,6 +4695,15 @@ metadata:
   labels:
     app: grafana
     release: prometheus-operator
+  name: prometheus-operator-grafana-test
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: grafana
+    release: prometheus-operator
   name: prometheus-operator-grafana
   namespace: default
 ---
@@ -4717,14 +4726,6 @@ metadata:
     app: prometheus-operator-alertmanager
     release: prometheus-operator
   name: prometheus-operator-alertmanager
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app: grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana-test
 ---
 apiVersion: v1
 imagePullSecrets: []
@@ -4767,6 +4768,24 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  labels:
+    app: grafana
+    release: prometheus-operator
+  name: prometheus-operator-grafana-test
+  namespace: default
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - prometheus-operator-grafana-test
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
   annotations:
     helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
@@ -4782,23 +4801,6 @@ rules:
   verbs:
   - get
   - create
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  labels:
-    app: grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana-test
-rules:
-- apiGroups:
-  - policy
-  resourceNames:
-  - prometheus-operator-grafana-test
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
@@ -5247,6 +5249,23 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
+  labels:
+    app: grafana
+    release: prometheus-operator
+  name: prometheus-operator-grafana-test
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prometheus-operator-grafana-test
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator-grafana-test
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
   annotations:
     helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
@@ -5261,22 +5280,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-admission
-  namespace: default
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  labels:
-    app: grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana-test
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: prometheus-operator-grafana-test
-subjects:
-- kind: ServiceAccount
-  name: prometheus-operator-grafana-test
   namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -5486,6 +5489,23 @@ metadata:
 ---
 apiVersion: v1
 data:
+  run.sh: |-
+    @test "Test Health" {
+      url="http://prometheus-operator-grafana/api/health"
+
+      code=$(curl -s -o /dev/null -I -w "%{http_code}" $url)
+      [ "$code" == "200" ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: prometheus-operator-grafana
+    release: prometheus-operator
+  name: prometheus-operator-grafana-test
+  namespace: default
+---
+apiVersion: v1
+data:
   grafana.ini: |
     [analytics]
     check_for_updates = true
@@ -5532,22 +5552,6 @@ metadata:
     grafana_datasource: "1"
     release: prometheus-operator
   name: prometheus-operator-grafana-datasource
----
-apiVersion: v1
-data:
-  run.sh: |-
-    @test "Test Health" {
-      url="http://prometheus-operator-grafana/api/health"
-
-      code=$(curl -s -o /dev/null -I -w "%{http_code}" $url)
-      [ "$code" == "200" ]
-    }
-kind: ConfigMap
-metadata:
-  labels:
-    app: prometheus-operator-grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana-test
 ---
 apiVersion: v1
 data:
@@ -5808,10 +5812,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: a86c1f347c0daf1d69a26e769be851b709f0433b401f183e1de08ecf9f136dd7
+        checksum/config: 44200c79d8b0acc6daaa06646cb07ccbc3cec70cbc7a84a4098a4480f5ad6e24
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: 4e7c659acaa5708963142cd4dfef8ffe06a98100522465a208f1856c8dab639e
-        checksum/secret: a86bf8680c1d4186682207bd28740b6cc63c433316511027142e8e0e11faf565
+        checksum/sc-dashboard-provider-config: 3b8c3a88285cd38d7313660550d6b502c0c862b1e37216d6fd08259ec1654c15
+        checksum/secret: b47e772a9d4836cb36ca30ad009ce282c6a57f8fa4c8928ec1e368b566aaf660
       labels:
         app: grafana
         release: prometheus-operator
@@ -6022,7 +6026,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-operator
-        chart: prometheus-operator-6.11.0
+        chart: prometheus-operator-6.11.1
         heritage: Tiller
         release: prometheus-operator
     spec:
@@ -6089,7 +6093,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-admission-create
-        chart: prometheus-operator-6.11.0
+        chart: prometheus-operator-6.11.1
         heritage: Tiller
         release: prometheus-operator
       name: prometheus-operator-admission-create
@@ -6108,7 +6112,6 @@ spec:
         runAsNonRoot: true
         runAsUser: 2000
       serviceAccountName: prometheus-operator-admission
-  ttlSecondsAfterFinished: 0
 ---
 apiVersion: batch/v1
 kind: Job
@@ -6125,7 +6128,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-admission-patch
-        chart: prometheus-operator-6.11.0
+        chart: prometheus-operator-6.11.1
         heritage: Tiller
         release: prometheus-operator
       name: prometheus-operator-admission-patch
@@ -6145,7 +6148,6 @@ spec:
         runAsNonRoot: true
         runAsUser: 2000
       serviceAccountName: prometheus-operator-admission
-  ttlSecondsAfterFinished: 0
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -6344,7 +6346,7 @@ kind: Alertmanager
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -6370,7 +6372,7 @@ kind: Prometheus
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6412,7 +6414,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: ark-metrics
@@ -6444,7 +6446,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: helm-exporter
@@ -6476,7 +6478,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: nginx-ingress-controller-metrics
@@ -6508,7 +6510,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -6529,7 +6531,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-apiserver
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-apiserver
@@ -6556,7 +6558,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-coredns
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-coredns
@@ -6578,7 +6580,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-grafana
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-grafana
@@ -6599,7 +6601,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-controller-manager
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-controller-manager
@@ -6621,7 +6623,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-etcd
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-etcd
@@ -6643,7 +6645,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-proxy
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-proxy
@@ -6665,7 +6667,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-scheduler
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler
@@ -6687,7 +6689,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-state-metrics
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-state-metrics
@@ -6706,7 +6708,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kubelet
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubelet
@@ -6740,7 +6742,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-node-exporter
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-exporter
@@ -6758,7 +6760,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-operator
@@ -6779,7 +6781,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.11.0
+    chart: prometheus-operator-6.11.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -6794,6 +6796,35 @@ spec:
     matchLabels:
       app: prometheus-operator-prometheus
       release: prometheus-operator
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app: grafana
+    release: prometheus-operator
+  name: prometheus-operator-grafana-test
+  namespace: default
+spec:
+  allowPrivilegeEscalation: true
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - projected
+  - secret
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
@@ -6916,34 +6947,6 @@ spec:
   - secret
   - downwardAPI
   - persistentVolumeClaim
----
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  labels:
-    app: grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana-test
-spec:
-  allowPrivilegeEscalation: true
-  fsGroup:
-    rule: RunAsAny
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  privileged: false
-  runAsUser:
-    rule: RunAsAny
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    rule: RunAsAny
-  volumes:
-  - configMap
-  - downwardAPI
-  - emptyDir
-  - projected
-  - secret
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
@@ -7074,6 +7077,7 @@ metadata:
     app: prometheus-operator-grafana
     release: prometheus-operator
   name: prometheus-operator-grafana-test
+  namespace: default
 spec:
   containers:
   - command:
