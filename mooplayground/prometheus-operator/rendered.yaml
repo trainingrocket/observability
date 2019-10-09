@@ -7072,7 +7072,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: null
+  storageClassName: aws-ebs-storageclass
 ---
 apiVersion: v1
 kind: Pod
