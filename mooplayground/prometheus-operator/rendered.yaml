@@ -5527,6 +5527,7 @@ data:
     auth_url = https://servicerocket.okta.com/oauth2/v1/authorize
     token_url = https://servicerocket.okta.com/oauth2/v1/token
     api_url = https://servicerocket.okta.com/oauth2/v1/userinfo
+  plugins: instana-datasource
 kind: ConfigMap
 metadata:
   labels:
@@ -5812,7 +5813,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: f459932fb44957c587e1207d749ab4ce724bc901b56c4742d199f84432fb938b
+        checksum/config: 8bac6d34bc2103303cb6d3bca29cfd35ba2e902d3cd3e05f63b4c5fc25db8f7b
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
         checksum/sc-dashboard-provider-config: 7640d3587b1c0686bae0a064c91377edccf815e96bcfef85c869073804adef59
         checksum/secret: 0096a2b444f6de16f827919473439aaf62d3cef2d53b76360f36aaca96428a41
@@ -5845,6 +5846,11 @@ spec:
           valueFrom:
             secretKeyRef:
               key: admin-password
+              name: prometheus-operator-grafana
+        - name: GF_INSTALL_PLUGINS
+          valueFrom:
+            configMapKeyRef:
+              key: plugins
               name: prometheus-operator-grafana
         image: grafana/grafana:6.3.5
         imagePullPolicy: IfNotPresent
