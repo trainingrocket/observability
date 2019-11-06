@@ -6,7 +6,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: alertmanagers.monitoring.coreos.com
@@ -1550,7 +1550,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: podmonitors.monitoring.coreos.com
@@ -1736,7 +1736,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheuses.monitoring.coreos.com
@@ -4111,7 +4111,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheusrules.monitoring.coreos.com
@@ -4398,7 +4398,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: servicemonitors.monitoring.coreos.com
@@ -4644,6 +4644,7 @@ metadata:
     app: prometheus-operator-admission
     release: prometheus-operator
   name: prometheus-operator-admission
+  namespace: monitoring
 webhooks:
 - clientConfig:
     service:
@@ -4670,6 +4671,7 @@ metadata:
     app: prometheus-operator-admission
     release: prometheus-operator
   name: prometheus-operator-admission
+  namespace: monitoring
 webhooks:
 - clientConfig:
     service:
@@ -4692,6 +4694,28 @@ webhooks:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
+  namespace: monitoring
+---
+apiVersion: v1
+imagePullSecrets: []
+kind: ServiceAccount
+metadata:
+  labels:
+    app: prometheus-operator-alertmanager
+    release: prometheus-operator
+  name: prometheus-operator-alertmanager
+  namespace: monitoring
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   labels:
     app: grafana
     release: prometheus-operator
@@ -4708,24 +4732,24 @@ metadata:
   namespace: monitoring
 ---
 apiVersion: v1
+imagePullSecrets: []
 kind: ServiceAccount
 metadata:
-  annotations:
-    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
   labels:
-    app: prometheus-operator-admission
+    app: prometheus-operator-operator
     release: prometheus-operator
-  name: prometheus-operator-admission
+  name: prometheus-operator-operator
+  namespace: monitoring
 ---
 apiVersion: v1
 imagePullSecrets: []
 kind: ServiceAccount
 metadata:
   labels:
-    app: prometheus-operator-alertmanager
+    app: prometheus-operator-prometheus
     release: prometheus-operator
-  name: prometheus-operator-alertmanager
+  name: prometheus-operator-prometheus
+  namespace: monitoring
 ---
 apiVersion: v1
 imagePullSecrets: []
@@ -4735,17 +4759,8 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.3.1
+    helm.sh/chart: kube-state-metrics-2.4.1
   name: prometheus-operator-kube-state-metrics
----
-apiVersion: v1
-imagePullSecrets: []
-kind: ServiceAccount
-metadata:
-  labels:
-    app: prometheus-operator-operator
-    release: prometheus-operator
-  name: prometheus-operator-operator
 ---
 apiVersion: v1
 imagePullSecrets: []
@@ -4756,14 +4771,25 @@ metadata:
     release: prometheus-operator
   name: prometheus-operator-prometheus-node-exporter
 ---
-apiVersion: v1
-imagePullSecrets: []
-kind: ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
 metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
   labels:
-    app: prometheus-operator-prometheus
+    app: prometheus-operator-admission
     release: prometheus-operator
-  name: prometheus-operator-prometheus
+  name: prometheus-operator-admission
+  namespace: monitoring
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -4782,25 +4808,6 @@ rules:
   - podsecuritypolicies
   verbs:
   - use
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  annotations:
-    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
-  labels:
-    app: prometheus-operator-admission
-    release: prometheus-operator
-  name: prometheus-operator-admission
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-  - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
@@ -5040,13 +5047,31 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.3.1
+    helm.sh/chart: kube-state-metrics-2.4.1
   name: psp-prometheus-operator-kube-state-metrics
 rules:
 - apiGroups:
   - extensions
   resourceNames:
   - prometheus-operator-kube-state-metrics
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: prometheus-node-exporter
+    jobLabel: node-exporter
+    release: prometheus-operator
+  name: psp-prometheus-operator-prometheus-node-exporter
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - prometheus-operator-prometheus-node-exporter
   resources:
   - podsecuritypolicies
   verbs:
@@ -5059,7 +5084,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.3.1
+    helm.sh/chart: kube-state-metrics-2.4.1
   name: prometheus-operator-kube-state-metrics
 rules:
 - apiGroups:
@@ -5228,23 +5253,25 @@ rules:
   - list
   - watch
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
 metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
   labels:
-    app: prometheus-node-exporter
-    jobLabel: node-exporter
+    app: prometheus-operator-admission
     release: prometheus-operator
-  name: psp-prometheus-operator-prometheus-node-exporter
-rules:
-- apiGroups:
-  - extensions
-  resourceNames:
-  - prometheus-operator-prometheus-node-exporter
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
+  name: prometheus-operator-admission
+  namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prometheus-operator-admission
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator-admission
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -5261,25 +5288,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-grafana-test
-  namespace: monitoring
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  annotations:
-    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
-  labels:
-    app: prometheus-operator-admission
-    release: prometheus-operator
-  name: prometheus-operator-admission
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: prometheus-operator-admission
-subjects:
-- kind: ServiceAccount
-  name: prometheus-operator-admission
   namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -5309,6 +5317,7 @@ metadata:
     app: prometheus-operator-admission
     release: prometheus-operator
   name: prometheus-operator-admission
+  namespace: monitoring
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -5421,7 +5430,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.3.1
+    helm.sh/chart: kube-state-metrics-2.4.1
   name: psp-prometheus-operator-kube-state-metrics
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -5432,25 +5441,7 @@ subjects:
   name: prometheus-operator-kube-state-metrics
   namespace: monitoring
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/instance: prometheus-operator
-    app.kubernetes.io/managed-by: Tiller
-    app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.3.1
-  name: prometheus-operator-kube-state-metrics
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: prometheus-operator-kube-state-metrics
-subjects:
-- kind: ServiceAccount
-  name: prometheus-operator-kube-state-metrics
-  namespace: monitoring
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
@@ -5465,6 +5456,24 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator-prometheus-node-exporter
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: prometheus-operator
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: kube-state-metrics
+    helm.sh/chart: kube-state-metrics-2.4.1
+  name: prometheus-operator-kube-state-metrics
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-operator-kube-state-metrics
+subjects:
+- kind: ServiceAccount
+  name: prometheus-operator-kube-state-metrics
   namespace: monitoring
 ---
 apiVersion: v1
@@ -5485,6 +5494,25 @@ metadata:
     app: grafana
     release: prometheus-operator
   name: prometheus-operator-grafana-config-dashboards
+  namespace: monitoring
+---
+apiVersion: v1
+data:
+  datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-operator-prometheus:9090/
+      access: proxy
+      isDefault: true
+kind: ConfigMap
+metadata:
+  labels:
+    app: prometheus-operator-grafana
+    grafana_datasource: "1"
+    release: prometheus-operator
+  name: prometheus-operator-grafana-datasource
   namespace: monitoring
 ---
 apiVersion: v1
@@ -5538,21 +5566,14 @@ metadata:
 ---
 apiVersion: v1
 data:
-  datasource.yaml: |-
-    apiVersion: 1
-    datasources:
-    - name: Prometheus
-      type: prometheus
-      url: http://prometheus-operator-prometheus:9090/
-      access: proxy
-      isDefault: true
-kind: ConfigMap
+  alertmanager.yaml: Z2xvYmFsOgogIHJlc29sdmVfdGltZW91dDogNW0KcmVjZWl2ZXJzOgotIG5hbWU6ICJudWxsIgpyb3V0ZToKICBncm91cF9ieToKICAtIGpvYgogIGdyb3VwX2ludGVydmFsOiA1bQogIGdyb3VwX3dhaXQ6IDMwcwogIHJlY2VpdmVyOiAibnVsbCIKICByZXBlYXRfaW50ZXJ2YWw6IDEyaAogIHJvdXRlczoKICAtIG1hdGNoOgogICAgICBhbGVydG5hbWU6IFdhdGNoZG9nCiAgICByZWNlaXZlcjogIm51bGwiCg==
+kind: Secret
 metadata:
   labels:
-    app: prometheus-operator-grafana
-    grafana_datasource: "1"
+    app: prometheus-operator-alertmanager
     release: prometheus-operator
-  name: prometheus-operator-grafana-datasource
+  name: alertmanager-prometheus-operator-alertmanager
+  namespace: monitoring
 ---
 apiVersion: v1
 data:
@@ -5567,16 +5588,6 @@ metadata:
   name: prometheus-operator-grafana
   namespace: monitoring
 type: Opaque
----
-apiVersion: v1
-data:
-  alertmanager.yaml: Z2xvYmFsOgogIHJlc29sdmVfdGltZW91dDogNW0KcmVjZWl2ZXJzOgotIG5hbWU6ICJudWxsIgpyb3V0ZToKICBncm91cF9ieToKICAtIGpvYgogIGdyb3VwX2ludGVydmFsOiA1bQogIGdyb3VwX3dhaXQ6IDMwcwogIHJlY2VpdmVyOiAibnVsbCIKICByZXBlYXRfaW50ZXJ2YWw6IDEyaAogIHJvdXRlczoKICAtIG1hdGNoOgogICAgICBhbGVydG5hbWU6IFdhdGNoZG9nCiAgICByZWNlaXZlcjogIm51bGwiCg==
-kind: Secret
-metadata:
-  labels:
-    app: prometheus-operator-alertmanager
-    release: prometheus-operator
-  name: alertmanager-prometheus-operator-alertmanager
 ---
 apiVersion: v1
 kind: Service
@@ -5681,6 +5692,25 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app: prometheus-operator-alertmanager
+    release: prometheus-operator
+  name: prometheus-operator-alertmanager
+  namespace: monitoring
+spec:
+  ports:
+  - name: web
+    port: 9093
+    protocol: TCP
+    targetPort: 9093
+  selector:
+    alertmanager: prometheus-operator-alertmanager
+    app: alertmanager
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app: grafana
     release: prometheus-operator
   name: prometheus-operator-grafana
@@ -5700,49 +5730,10 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: prometheus-operator-alertmanager
-    release: prometheus-operator
-  name: prometheus-operator-alertmanager
-spec:
-  ports:
-  - name: web
-    port: 9093
-    protocol: TCP
-    targetPort: 9093
-  selector:
-    alertmanager: prometheus-operator-alertmanager
-    app: alertmanager
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    prometheus.io/scrape: "true"
-  labels:
-    app.kubernetes.io/instance: prometheus-operator
-    app.kubernetes.io/managed-by: Tiller
-    app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.3.1
-  name: prometheus-operator-kube-state-metrics
-spec:
-  ports:
-  - name: http
-    port: 8080
-    protocol: TCP
-    targetPort: 8080
-  selector:
-    app.kubernetes.io/instance: prometheus-operator
-    app.kubernetes.io/name: kube-state-metrics
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     app: prometheus-operator-operator
     release: prometheus-operator
   name: prometheus-operator-operator
+  namespace: monitoring
 spec:
   ports:
   - name: http
@@ -5754,6 +5745,47 @@ spec:
   selector:
     app: prometheus-operator-operator
     release: prometheus-operator
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus-operator-prometheus
+    release: prometheus-operator
+    self-monitor: "true"
+  name: prometheus-operator-prometheus
+  namespace: monitoring
+spec:
+  ports:
+  - name: web
+    port: 9090
+    targetPort: 9090
+  selector:
+    app: prometheus
+    prometheus: prometheus-operator-prometheus
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: prometheus-operator
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: kube-state-metrics
+    helm.sh/chart: kube-state-metrics-2.4.1
+  name: prometheus-operator-kube-state-metrics
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/instance: prometheus-operator
+    app.kubernetes.io/name: kube-state-metrics
   type: ClusterIP
 ---
 apiVersion: v1
@@ -5777,23 +5809,6 @@ spec:
     release: prometheus-operator
   type: ClusterIP
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: prometheus-operator-prometheus
-    release: prometheus-operator
-  name: prometheus-operator-prometheus
-spec:
-  ports:
-  - name: web
-    port: 9090
-    targetPort: 9090
-  selector:
-    app: prometheus
-    prometheus: prometheus-operator-prometheus
-  type: ClusterIP
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5813,10 +5828,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 8bac6d34bc2103303cb6d3bca29cfd35ba2e902d3cd3e05f63b4c5fc25db8f7b
+        checksum/config: 6a3a8f359c543cb24082e8b8b5f5db65580fed731bbfb146065d457f944d815a
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: 7640d3587b1c0686bae0a064c91377edccf815e96bcfef85c869073804adef59
-        checksum/secret: 0096a2b444f6de16f827919473439aaf62d3cef2d53b76360f36aaca96428a41
+        checksum/sc-dashboard-provider-config: 0f4146b4b16a796ef2981b1382043f1e4f44ace988f63c4855003e79f0dcbacc
+        checksum/secret: b3b1a0907fa48e8ee6f54c5154a47de2493794e84674d8e3a6294717bff00a09
       labels:
         app: grafana
         release: prometheus-operator
@@ -5852,7 +5867,7 @@ spec:
             configMapKeyRef:
               key: plugins
               name: prometheus-operator-grafana
-        image: grafana/grafana:6.3.5
+        image: grafana/grafana:6.4.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 10
@@ -5878,9 +5893,6 @@ spec:
         - mountPath: /etc/grafana/grafana.ini
           name: config
           subPath: grafana.ini
-        - mountPath: /etc/grafana/ldap.toml
-          name: ldap
-          subPath: ldap.toml
         - mountPath: /var/lib/grafana
           name: storage
         - mountPath: /tmp/dashboards
@@ -5929,12 +5941,6 @@ spec:
       - configMap:
           name: prometheus-operator-grafana
         name: config
-      - name: ldap
-        secret:
-          items:
-          - key: ldap-toml
-            path: ldap.toml
-          secretName: prometheus-operator-grafana
       - name: storage
         persistentVolumeClaim:
           claimName: prometheus-operator-grafana
@@ -5950,10 +5956,82 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: prometheus-operator-operator
+    release: prometheus-operator
+  name: prometheus-operator-operator
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-operator-operator
+      release: prometheus-operator
+  template:
+    metadata:
+      labels:
+        app: prometheus-operator-operator
+        chart: prometheus-operator-8.1.1
+        heritage: Tiller
+        release: prometheus-operator
+    spec:
+      containers:
+      - args:
+        - --kubelet-service=kube-system/prometheus-operator-kubelet
+        - --logtostderr=true
+        - --localhost=127.0.0.1
+        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.34.0
+        - --config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1
+        - --config-reloader-cpu=100m
+        - --config-reloader-memory=25Mi
+        image: quay.io/coreos/prometheus-operator:v0.34.0
+        imagePullPolicy: IfNotPresent
+        name: prometheus-operator
+        ports:
+        - containerPort: 8080
+          name: http
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+      - args:
+        - server
+        - --listen=:8443
+        - --target=127.0.0.1:8080
+        - --key=cert/key
+        - --cert=cert/cert
+        - --disable-authentication
+        image: squareup/ghostunnel:v1.4.1
+        imagePullPolicy: IfNotPresent
+        name: tls-proxy
+        ports:
+        - containerPort: 8443
+          name: https
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /cert
+          name: tls-proxy-secret
+          readOnly: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: prometheus-operator-operator
+      volumes:
+      - name: tls-proxy-secret
+        secret:
+          defaultMode: 420
+          secretName: prometheus-operator-admission
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.3.1
+    helm.sh/chart: kube-state-metrics-2.4.1
   name: prometheus-operator-kube-state-metrics
 spec:
   replicas: 1
@@ -5991,7 +6069,7 @@ spec:
         - --collectors=services
         - --collectors=statefulsets
         - --collectors=storageclasses
-        image: quay.io/coreos/kube-state-metrics:v1.7.2
+        image: quay.io/coreos/kube-state-metrics:v1.8.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -6008,7 +6086,6 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           timeoutSeconds: 5
-        resources: null
       hostNetwork: false
       securityContext:
         fsGroup: 65534
@@ -6016,148 +6093,6 @@ spec:
       serviceAccountName: prometheus-operator-kube-state-metrics
 ---
 apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: prometheus-operator-operator
-    release: prometheus-operator
-  name: prometheus-operator-operator
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: prometheus-operator-operator
-      release: prometheus-operator
-  template:
-    metadata:
-      labels:
-        app: prometheus-operator-operator
-        chart: prometheus-operator-6.14.1
-        heritage: Tiller
-        release: prometheus-operator
-    spec:
-      containers:
-      - args:
-        - --kubelet-service=kube-system/prometheus-operator-kubelet
-        - --logtostderr=true
-        - --crd-apigroup=monitoring.coreos.com
-        - --localhost=127.0.0.1
-        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.32.0
-        - --config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1
-        - --config-reloader-cpu=100m
-        - --config-reloader-memory=25Mi
-        image: quay.io/coreos/prometheus-operator:v0.32.0
-        imagePullPolicy: IfNotPresent
-        name: prometheus-operator
-        ports:
-        - containerPort: 8080
-          name: http
-        resources: {}
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-      - args:
-        - server
-        - --listen=:8443
-        - --target=127.0.0.1:8080
-        - --key=cert/key
-        - --cert=cert/cert
-        - --disable-authentication
-        image: squareup/ghostunnel:v1.4.1
-        imagePullPolicy: IfNotPresent
-        name: tls-proxy
-        ports:
-        - containerPort: 8443
-          name: https
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-        volumeMounts:
-        - mountPath: /cert
-          name: tls-proxy-secret
-          readOnly: true
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-      serviceAccountName: prometheus-operator-operator
-      volumes:
-      - name: tls-proxy-secret
-        secret:
-          defaultMode: 420
-          secretName: prometheus-operator-admission
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    helm.sh/hook: pre-install,pre-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
-  labels:
-    app: prometheus-operator-admission-create
-    release: prometheus-operator
-  name: prometheus-operator-admission-create
-spec:
-  template:
-    metadata:
-      labels:
-        app: prometheus-operator-admission-create
-        chart: prometheus-operator-6.14.1
-        heritage: Tiller
-        release: prometheus-operator
-      name: prometheus-operator-admission-create
-    spec:
-      containers:
-      - args:
-        - create
-        - --host=prometheus-operator-operator,prometheus-operator-operator.monitoring.svc
-        - --namespace=monitoring
-        - --secret-name=prometheus-operator-admission
-        image: jettech/kube-webhook-certgen:v1.0.0
-        imagePullPolicy: null
-        name: create
-      restartPolicy: OnFailure
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 2000
-      serviceAccountName: prometheus-operator-admission
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    helm.sh/hook: post-install,post-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
-  labels:
-    app: prometheus-operator-admission-patch
-    release: prometheus-operator
-  name: prometheus-operator-admission-patch
-spec:
-  template:
-    metadata:
-      labels:
-        app: prometheus-operator-admission-patch
-        chart: prometheus-operator-6.14.1
-        heritage: Tiller
-        release: prometheus-operator
-      name: prometheus-operator-admission-patch
-    spec:
-      containers:
-      - args:
-        - patch
-        - --webhook-name=prometheus-operator-admission
-        - --namespace=monitoring
-        - --secret-name=prometheus-operator-admission
-        - --patch-failure-policy=Fail
-        image: jettech/kube-webhook-certgen:v1.0.0
-        imagePullPolicy: null
-        name: patch
-      restartPolicy: OnFailure
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 2000
-      serviceAccountName: prometheus-operator-admission
----
-apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   labels:
@@ -6174,7 +6109,7 @@ spec:
     metadata:
       labels:
         app: prometheus-node-exporter
-        chart: prometheus-node-exporter-1.5.2
+        chart: prometheus-node-exporter-1.7.3
         heritage: Tiller
         jobLabel: node-exporter
         release: prometheus-operator
@@ -6186,7 +6121,7 @@ spec:
         - --web.listen-address=0.0.0.0:9100
         - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+)($|/)
         - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$
-        image: quay.io/prometheus/node-exporter:v0.18.0
+        image: quay.io/prometheus/node-exporter:v0.18.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -6230,6 +6165,106 @@ spec:
       maxUnavailable: 1
     type: RollingUpdate
 ---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission-create
+    release: prometheus-operator
+  name: prometheus-operator-admission-create
+  namespace: monitoring
+spec:
+  template:
+    metadata:
+      labels:
+        app: prometheus-operator-admission-create
+        chart: prometheus-operator-8.1.1
+        heritage: Tiller
+        release: prometheus-operator
+      name: prometheus-operator-admission-create
+    spec:
+      containers:
+      - args:
+        - create
+        - --host=prometheus-operator-operator,prometheus-operator-operator.monitoring.svc
+        - --namespace=monitoring
+        - --secret-name=prometheus-operator-admission
+        image: jettech/kube-webhook-certgen:v1.0.0
+        imagePullPolicy: null
+        name: create
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 2000
+      serviceAccountName: prometheus-operator-admission
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission-patch
+    release: prometheus-operator
+  name: prometheus-operator-admission-patch
+  namespace: monitoring
+spec:
+  template:
+    metadata:
+      labels:
+        app: prometheus-operator-admission-patch
+        chart: prometheus-operator-8.1.1
+        heritage: Tiller
+        release: prometheus-operator
+      name: prometheus-operator-admission-patch
+    spec:
+      containers:
+      - args:
+        - patch
+        - --webhook-name=prometheus-operator-admission
+        - --namespace=monitoring
+        - --secret-name=prometheus-operator-admission
+        - --patch-failure-policy=Fail
+        image: jettech/kube-webhook-certgen:v1.0.0
+        imagePullPolicy: null
+        name: patch
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 2000
+      serviceAccountName: prometheus-operator-admission
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/cluster-issuer: ca-issuer-ent-yardrat-org
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/whitelist-source-range: 66.201.42.194/32,135.84.144.214/32,216.241.29.130/32,210.19.86.66/32,175.143.105.73/32,220.233.129.3/32,59.167.165.193/32
+  labels:
+    app: prometheus-operator-alertmanager
+    release: prometheus-operator
+  name: prometheus-operator-alertmanager
+  namespace: monitoring
+spec:
+  rules:
+  - host: alertmanager.ent.yardrat.org
+    http:
+      paths:
+      - backend:
+          serviceName: prometheus-operator-alertmanager
+          servicePort: 9093
+        path: /
+  tls:
+  - hosts:
+    - alertmanager.ent.yardrat.org
+    secretName: alertmanager-ent-ssl-certificate
+---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -6266,35 +6301,10 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/whitelist-source-range: 66.201.42.194/32,135.84.144.214/32,216.241.29.130/32,210.19.86.66/32,175.143.105.73/32,220.233.129.3/32,59.167.165.193/32
   labels:
-    app: prometheus-operator-alertmanager
-    release: prometheus-operator
-  name: prometheus-operator-alertmanager
-spec:
-  rules:
-  - host: alertmanager.ent.yardrat.org
-    http:
-      paths:
-      - backend:
-          serviceName: prometheus-operator-alertmanager
-          servicePort: 9093
-        path: /
-  tls:
-  - hosts:
-    - alertmanager.ent.yardrat.org
-    secretName: alertmanager-ent-ssl-certificate
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    certmanager.k8s.io/cluster-issuer: ca-issuer-ent-yardrat-org
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/whitelist-source-range: 66.201.42.194/32,135.84.144.214/32,216.241.29.130/32,210.19.86.66/32,175.143.105.73/32,220.233.129.3/32,59.167.165.193/32
-  labels:
     app: prometheus-operator-prometheus
     release: prometheus-operator
   name: prometheus-operator-prometheus
+  namespace: monitoring
 spec:
   rules:
   - host: prometheus.ent.yardrat.org
@@ -6309,55 +6319,16 @@ spec:
     - prometheus.ent.yardrat.org
     secretName: prometheus-ent-ssl-certificate
 ---
-apiVersion: extensions/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  labels:
-    app: prometheus-node-exporter
-    jobLabel: node-exporter
-    release: prometheus-operator
-  name: prometheus-operator-prometheus-node-exporter
-spec:
-  fsGroup:
-    ranges:
-    - max: 65535
-      min: 0
-    rule: MustRunAs
-  hostIPC: false
-  hostNetwork: true
-  hostPID: true
-  hostPorts:
-  - max: 65535
-    min: 0
-  privileged: false
-  readOnlyRootFilesystem: false
-  runAsUser:
-    rule: RunAsAny
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    ranges:
-    - max: 65535
-      min: 0
-    rule: MustRunAs
-  volumes:
-  - configMap
-  - emptyDir
-  - projected
-  - secret
-  - downwardAPI
-  - persistentVolumeClaim
-  - hostPath
----
 apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
+  namespace: monitoring
 spec:
   baseImage: quay.io/prometheus/alertmanager
   externalUrl: http://alertmanager.ent.yardrat.org/
@@ -6380,10 +6351,11 @@ kind: Prometheus
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
+  namespace: monitoring
 spec:
   alerting:
     alertmanagers:
@@ -6419,17 +6391,18 @@ spec:
   serviceMonitorSelector:
     matchLabels:
       release: prometheus-operator
-  version: v2.12.0
+  version: v2.13.1
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: ark-metrics
+  namespace: monitoring
 spec:
   endpoints:
   - port: ""
@@ -6458,10 +6431,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: helm-exporter
+  namespace: monitoring
 spec:
   endpoints:
   - port: metrics
@@ -6490,10 +6464,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: nginx-ingress-controller-metrics
+  namespace: monitoring
 spec:
   endpoints:
   - port: metrics
@@ -6522,10 +6497,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
+  namespace: monitoring
 spec:
   endpoints:
   - path: /metrics
@@ -6543,10 +6519,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-apiserver
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-apiserver
+  namespace: monitoring
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -6570,10 +6547,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-coredns
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-coredns
+  namespace: monitoring
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -6592,10 +6570,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-grafana
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-grafana
+  namespace: monitoring
 spec:
   endpoints:
   - path: /metrics
@@ -6613,10 +6592,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-controller-manager
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-controller-manager
+  namespace: monitoring
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -6635,10 +6615,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-etcd
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-etcd
+  namespace: monitoring
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -6657,10 +6638,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-proxy
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-proxy
+  namespace: monitoring
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -6679,10 +6661,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-scheduler
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler
+  namespace: monitoring
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -6701,10 +6684,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-state-metrics
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-state-metrics
+  namespace: monitoring
 spec:
   endpoints:
   - honorLabels: true
@@ -6720,10 +6704,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kubelet
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubelet
+  namespace: monitoring
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -6754,10 +6739,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-node-exporter
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-exporter
+  namespace: monitoring
 spec:
   endpoints:
   - port: metrics
@@ -6772,10 +6758,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-operator
+  namespace: monitoring
 spec:
   endpoints:
   - honorLabels: true
@@ -6793,10 +6780,11 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-6.14.1
+    chart: prometheus-operator-8.1.1
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
+  namespace: monitoring
 spec:
   endpoints:
   - path: /metrics
@@ -6808,6 +6796,82 @@ spec:
     matchLabels:
       app: prometheus-operator-prometheus
       release: prometheus-operator
+      self-monitor: "true"
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+  labels:
+    app: prometheus-operator-admission
+    release: prometheus-operator
+  name: prometheus-operator-admission
+  namespace: monitoring
+spec:
+  fsGroup:
+    ranges:
+    - max: 65535
+      min: 0
+    rule: MustRunAs
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  readOnlyRootFilesystem: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    ranges:
+    - max: 65535
+      min: 0
+    rule: MustRunAs
+  volumes:
+  - configMap
+  - emptyDir
+  - projected
+  - secret
+  - downwardAPI
+  - persistentVolumeClaim
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app: prometheus-operator-alertmanager
+    release: prometheus-operator
+  name: prometheus-operator-alertmanager
+  namespace: monitoring
+spec:
+  fsGroup:
+    ranges:
+    - max: 65535
+      min: 0
+    rule: MustRunAs
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  readOnlyRootFilesystem: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    ranges:
+    - max: 65535
+      min: 0
+    rule: MustRunAs
+  volumes:
+  - configMap
+  - emptyDir
+  - projected
+  - secret
+  - downwardAPI
+  - persistentVolumeClaim
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
@@ -6890,115 +6954,11 @@ spec:
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  annotations:
-    helm.sh/hook: pre-install,pre-upgrade,post-install,post-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
-  labels:
-    app: prometheus-operator-admission
-    release: prometheus-operator
-  name: prometheus-operator-admission
-spec:
-  fsGroup:
-    ranges:
-    - max: 65535
-      min: 0
-    rule: MustRunAs
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  privileged: false
-  readOnlyRootFilesystem: false
-  runAsUser:
-    rule: RunAsAny
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    ranges:
-    - max: 65535
-      min: 0
-    rule: MustRunAs
-  volumes:
-  - configMap
-  - emptyDir
-  - projected
-  - secret
-  - downwardAPI
-  - persistentVolumeClaim
----
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  labels:
-    app: prometheus-operator-alertmanager
-    release: prometheus-operator
-  name: prometheus-operator-alertmanager
-spec:
-  fsGroup:
-    ranges:
-    - max: 65535
-      min: 0
-    rule: MustRunAs
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  privileged: false
-  readOnlyRootFilesystem: false
-  runAsUser:
-    rule: RunAsAny
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    ranges:
-    - max: 65535
-      min: 0
-    rule: MustRunAs
-  volumes:
-  - configMap
-  - emptyDir
-  - projected
-  - secret
-  - downwardAPI
-  - persistentVolumeClaim
----
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  labels:
-    app.kubernetes.io/instance: prometheus-operator
-    app.kubernetes.io/managed-by: Tiller
-    app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.3.1
-  name: prometheus-operator-kube-state-metrics
-spec:
-  fsGroup:
-    ranges:
-    - max: 65535
-      min: 1
-    rule: MustRunAs
-  hostIPC: false
-  hostNetwork: false
-  hostPID: false
-  privileged: false
-  readOnlyRootFilesystem: false
-  runAsUser:
-    rule: MustRunAsNonRoot
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    ranges:
-    - max: 65535
-      min: 1
-    rule: MustRunAs
-  volumes:
-  - secret
----
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
   labels:
     app: prometheus-operator-operator
     release: prometheus-operator
   name: prometheus-operator-operator
+  namespace: monitoring
 spec:
   fsGroup:
     ranges:
@@ -7034,6 +6994,7 @@ metadata:
     app: prometheus-operator-prometheus
     release: prometheus-operator
   name: prometheus-operator-prometheus
+  namespace: monitoring
 spec:
   fsGroup:
     ranges:
@@ -7061,6 +7022,78 @@ spec:
   - secret
   - downwardAPI
   - persistentVolumeClaim
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app.kubernetes.io/instance: prometheus-operator
+    app.kubernetes.io/managed-by: Tiller
+    app.kubernetes.io/name: kube-state-metrics
+    helm.sh/chart: kube-state-metrics-2.4.1
+  name: prometheus-operator-kube-state-metrics
+spec:
+  fsGroup:
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  readOnlyRootFilesystem: false
+  runAsUser:
+    rule: MustRunAsNonRoot
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  volumes:
+  - secret
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app: prometheus-node-exporter
+    jobLabel: node-exporter
+    release: prometheus-operator
+  name: prometheus-operator-prometheus-node-exporter
+spec:
+  fsGroup:
+    ranges:
+    - max: 65535
+      min: 0
+    rule: MustRunAs
+  hostIPC: false
+  hostNetwork: true
+  hostPID: true
+  hostPorts:
+  - max: 65535
+    min: 0
+  privileged: false
+  readOnlyRootFilesystem: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    ranges:
+    - max: 65535
+      min: 0
+    rule: MustRunAs
+  volumes:
+  - configMap
+  - emptyDir
+  - projected
+  - secret
+  - downwardAPI
+  - persistentVolumeClaim
+  - hostPath
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
