@@ -5813,10 +5813,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 517bc2456d9765c24b54da98cb46260c22ed99a23a966af5885e12a6968047d3
+        checksum/config: 5c6aded091badf0abd6de4969a8b7a9fe37eb9f111a2404af21371af50fcfe04
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: eaf0e8802edcd92bc31e36679336c8d007f2827d6053754b297e431c1ee7a433
-        checksum/secret: 35c91f46d80d23e13d6b68cf274a43432b7870269d8234e4fdeb04ba6dd661b3
+        checksum/sc-dashboard-provider-config: fb4122c20a3702813f4153c77b5f2d923a5944e275cd6da3860a3a268a8edbf2
+        checksum/secret: d93ba76434197c42801d7748d5a60e93b5e33e0843400b3983fbf211fd18c3c9
       labels:
         app: grafana
         release: prometheus-operator
