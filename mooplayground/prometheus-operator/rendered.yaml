@@ -6330,8 +6330,6 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
-  annotations:
-    iam.amazonaws.com/role: arn:aws:iam::305178833426:role/ThanosRole
   labels:
     app: prometheus-operator-prometheus
     chart: prometheus-operator-8.2.4
@@ -6353,6 +6351,9 @@ spec:
   logFormat: logfmt
   logLevel: info
   paused: false
+  podMetadata:
+    annotations:
+      iam.amazonaws.com/role: ThanosRole
   podMonitorNamespaceSelector: {}
   podMonitorSelector:
     matchLabels:
