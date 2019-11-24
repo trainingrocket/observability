@@ -6330,6 +6330,8 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
+  annotations:
+    iam.amazonaws.com/role: arn:aws:iam::305178833426:role/ThanosRole
   labels:
     app: prometheus-operator-prometheus
     chart: prometheus-operator-8.2.4
@@ -6374,11 +6376,9 @@ spec:
     matchLabels:
       release: prometheus-operator
   thanos:
-    annotations:
-      test.iam.amazonaws.com/role: role-arn
     baseImage: quay.io/thanos/thanos
     objectStorageConfig:
-      key: thanos.yaml
+      key: thanos-config.yaml
       name: thanos-objstore-config
     version: v0.8.1
   version: v2.13.1
