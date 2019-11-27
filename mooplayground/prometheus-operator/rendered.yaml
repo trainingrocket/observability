@@ -6387,6 +6387,13 @@ spec:
     objectStorageConfig:
       key: thanos.yaml
       name: thanos-objstore-config
+    resources:
+      limits:
+        cpu: 1
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
     version: v0.8.1
   version: v2.13.1
 ---
