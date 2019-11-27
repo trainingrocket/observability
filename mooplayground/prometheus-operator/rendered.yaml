@@ -6405,39 +6405,6 @@ metadata:
     chart: prometheus-operator-8.2.4
     heritage: Tiller
     release: prometheus-operator
-  name: ark-metrics
-  namespace: monitoring
-spec:
-  endpoints:
-  - port: ""
-  - bearerTokenFile: ""
-    interval: 30s
-    path: /metrics
-    scheme: http
-    targetPort: 8085
-    tlsConfig:
-      caFile: ""
-      certFile: ""
-      insecureSkipVerify: false
-      keyFile: ""
-      serverName: ""
-  namespaceSelector:
-    any: false
-    matchNames:
-    - aux
-  selector:
-    matchLabels:
-      app: ark
-      release: ark
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.2.4
-    heritage: Tiller
-    release: prometheus-operator
   name: helm-exporter
   namespace: monitoring
 spec:
@@ -6801,6 +6768,38 @@ spec:
       app: prometheus-operator-prometheus
       release: prometheus-operator
       self-monitor: "true"
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: prometheus-operator-prometheus
+    chart: prometheus-operator-8.2.4
+    heritage: Tiller
+    release: prometheus-operator
+  name: velero-metrics
+  namespace: monitoring
+spec:
+  endpoints:
+  - port: ""
+  - bearerTokenFile: ""
+    interval: 30s
+    path: /metrics
+    scheme: http
+    targetPort: 8085
+    tlsConfig:
+      caFile: ""
+      certFile: ""
+      insecureSkipVerify: false
+      keyFile: ""
+      serverName: ""
+  namespaceSelector:
+    any: false
+    matchNames:
+    - aux
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: velero
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
