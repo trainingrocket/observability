@@ -21,14 +21,23 @@ set -o xtrace
 
 CLUSTER=${CLUSTER:-mooplayground}
 
+deployPrometheusOperator() {
+    rdsCreds=$(aws secretsmanager get-secret-value --region=us-west-2 --secret-id "/operations/moo/monitoring/grafana/rdscreds" --query "SecretString" | jq "fromjson")
+    username=$(echo $rdsCreds | jq ".username" | sed "s/\"//g")
+    password=$(echo $rdsCreds | jq ".password" | sed "s/\"//g")
+    cat ${CLUSTER}/prometheus-operator/*.yaml | sed "s/GRAFANA_DB_USERNAME/$username/g" | sed "s/GRAFANA_DB_PASSWORD/$password/g" | kubectl apply -f -
+}
+
+
 main() {
     aws eks update-kubeconfig --name ${CLUSTER} --region=us-west-2
     kubectl config set-context --current --namespace=monitoring
     kubectl apply -n kube-system -f ${CLUSTER}/metrics-server/*
     kubectl apply -n kube-system -f ${CLUSTER}/cluster-autoscaler/*
-    kubectl apply -f  ${CLUSTER}/prometheus-operator/*
+    deployPrometheusOperator
     kubectl apply -f  ${CLUSTER}/prometheus-adapter/*
     kubectl apply -f  ${CLUSTER}/helm-exporter/*
+    kubectl apply -n monitoring -f ${CLUSTER}/thanos/
 }
 
 main
