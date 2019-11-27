@@ -5520,6 +5520,8 @@ metadata:
 apiVersion: v1
 data:
   grafana.ini: |
+    [server]
+    root_url = https://grafana.ent.learndot.com/
     [analytics]
     check_for_updates = true
     [grafana_net]
@@ -5531,15 +5533,12 @@ data:
     logs = /var/log/grafana
     plugins = /var/lib/grafana/plugins
     provisioning = /etc/grafana/provisioning
-    [auth.generic_oauth]
-    name = Okta
-    enabled = true
-    scopes = openid profile email
-    client_id = 0oa1favfuryGWvJsM1d8
-    client_secret = Drc5rXtQuB4gtTvrhCHWDI5cNJHAJpDGMoo4aaYZ
-    auth_url = https://servicerocket.okta.com/oauth2/v1/authorize
-    token_url = https://servicerocket.okta.com/oauth2/v1/token
-    api_url = https://servicerocket.okta.com/oauth2/v1/userinfo
+    [database]
+    type = postgres
+    host = moo-monitoring-grafanadb.cl108nkkaexy.us-west-2.rds.amazonaws.com
+    name = grafana
+    user = """GRAFANA_DB_USERNAME"""
+    password = """GRAFANA_DB_PASSWORD"""
   plugins: instana-datasource
 kind: ConfigMap
 metadata:
@@ -5746,6 +5745,12 @@ spec:
   - name: web
     port: 9090
     targetPort: 9090
+  - name: grpc
+    port: 10901
+    targetPort: 10901
+  - name: http
+    port: 10902
+    targetPort: 10902
   selector:
     app: prometheus
     prometheus: prometheus-operator-prometheus
@@ -5888,20 +5893,6 @@ spec:
         - mountPath: /etc/grafana/provisioning/datasources
           name: sc-datasources-volume
       initContainers:
-      - command:
-        - chown
-        - -R
-        - 472:472
-        - /var/lib/grafana
-        image: busybox:1.30
-        imagePullPolicy: IfNotPresent
-        name: init-chown-data
-        resources: {}
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-        - mountPath: /var/lib/grafana
-          name: storage
       - env:
         - name: METHOD
           value: LIST
@@ -5926,9 +5917,8 @@ spec:
       - configMap:
           name: prometheus-operator-grafana
         name: config
-      - name: storage
-        persistentVolumeClaim:
-          claimName: prometheus-operator-grafana
+      - emptyDir: {}
+        name: storage
       - emptyDir: {}
         name: sc-dashboard-volume
       - configMap:
@@ -6358,13 +6348,16 @@ spec:
   logFormat: logfmt
   logLevel: info
   paused: false
+  podMetadata:
+    annotations:
+      iam.amazonaws.com/role: ThanosRole
   podMonitorNamespaceSelector: {}
   podMonitorSelector:
     matchLabels:
       release: prometheus-operator
   portName: web
   replicas: 1
-  retention: 10d
+  retention: 2d
   routePrefix: /
   ruleNamespaceSelector: {}
   ruleSelector:
@@ -6380,40 +6373,20 @@ spec:
   serviceMonitorSelector:
     matchLabels:
       release: prometheus-operator
+  thanos:
+    baseImage: quay.io/thanos/thanos
+    objectStorageConfig:
+      key: thanos.yaml
+      name: thanos-objstore-config
+    resources:
+      limits:
+        cpu: 1
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    version: v0.8.1
   version: v2.13.1
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.2.4
-    heritage: Tiller
-    release: prometheus-operator
-  name: ark-metrics
-  namespace: monitoring
-spec:
-  endpoints:
-  - port: ""
-  - bearerTokenFile: ""
-    interval: 30s
-    path: /metrics
-    scheme: http
-    targetPort: 8085
-    tlsConfig:
-      caFile: ""
-      certFile: ""
-      insecureSkipVerify: false
-      keyFile: ""
-      serverName: ""
-  namespaceSelector:
-    any: false
-    matchNames:
-    - aux
-  selector:
-    matchLabels:
-      app: ark
-      release: ark
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -6787,6 +6760,38 @@ spec:
       release: prometheus-operator
       self-monitor: "true"
 ---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: prometheus-operator-prometheus
+    chart: prometheus-operator-8.2.4
+    heritage: Tiller
+    release: prometheus-operator
+  name: velero-metrics
+  namespace: monitoring
+spec:
+  endpoints:
+  - port: ""
+  - bearerTokenFile: ""
+    interval: 30s
+    path: /metrics
+    scheme: http
+    targetPort: 8085
+    tlsConfig:
+      caFile: ""
+      certFile: ""
+      insecureSkipVerify: false
+      keyFile: ""
+      serverName: ""
+  namespaceSelector:
+    any: false
+    matchNames:
+    - aux
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: velero
+---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -7083,24 +7088,6 @@ spec:
   - downwardAPI
   - persistentVolumeClaim
   - hostPath
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  finalizers:
-  - kubernetes.io/pvc-protection
-  labels:
-    app: grafana
-    release: prometheus-operator
-  name: prometheus-operator-grafana
-  namespace: monitoring
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: null
 ---
 apiVersion: v1
 kind: Pod
