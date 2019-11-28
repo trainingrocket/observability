@@ -5520,8 +5520,6 @@ metadata:
 apiVersion: v1
 data:
   grafana.ini: |
-    [server]
-    root_url = https://grafana.ent.learndot.com/
     [analytics]
     check_for_updates = true
     [grafana_net]
@@ -5533,21 +5531,6 @@ data:
     logs = /var/log/grafana
     plugins = /var/lib/grafana/plugins
     provisioning = /etc/grafana/provisioning
-    [auth.generic_oauth]
-    name = Okta
-    enabled = true
-    scopes = openid profile email
-    client_id = 0oa1g78bn0sSHVr6w1d8
-    client_secret = KerIZepG7wLr08FdY3PVGj4dqT4TXbTBmorqPfwj
-    auth_url = https://servicerocket.okta.com/oauth2/v1/authorize
-    token_url = https://servicerocket.okta.com/oauth2/v1/token
-    api_url = https://servicerocket.okta.com/oauth2/v1/userinfo
-    [database]
-    type = postgres
-    host = moo-monitoring-grafanadb.cl108nkkaexy.us-west-2.rds.amazonaws.com
-    name = grafana
-    user = """GRAFANA_DB_USERNAME"""
-    password = """GRAFANA_DB_PASSWORD"""
   plugins: instana-datasource
 kind: ConfigMap
 metadata:
@@ -6366,6 +6349,13 @@ spec:
       release: prometheus-operator
   portName: web
   replicas: 1
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 200m
+      memory: 4Gi
   retention: 2d
   routePrefix: /
   ruleNamespaceSelector: {}
