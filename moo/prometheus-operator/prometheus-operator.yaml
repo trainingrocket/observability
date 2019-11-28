@@ -5548,6 +5548,10 @@ data:
     name = grafana
     user = """GRAFANA_DB_USERNAME"""
     password = """GRAFANA_DB_PASSWORD"""
+    [users]
+    auto_assign_org = true
+    auto_assign_org_role = Editor
+    login_hint = Login with OkTA
   plugins: instana-datasource
 kind: ConfigMap
 metadata:
@@ -6366,6 +6370,13 @@ spec:
       release: prometheus-operator
   portName: web
   replicas: 1
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 200m
+      memory: 4Gi
   retention: 2d
   routePrefix: /
   ruleNamespaceSelector: {}
