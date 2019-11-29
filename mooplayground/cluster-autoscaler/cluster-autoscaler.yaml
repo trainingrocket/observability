@@ -239,7 +239,7 @@ spec:
         - ./cluster-autoscaler
         - --cloud-provider=aws
         - --namespace=kube-system
-        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/mooplayground
+        - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,kubernetes.io/cluster/mooplayground
         - --logtostderr=true
         - --scale-down-utilization-threshold=1.5
         - --stderrthreshold=info
@@ -247,7 +247,7 @@ spec:
         env:
         - name: AWS_REGION
           value: us-west-2
-        image: k8s.gcr.io/cluster-autoscaler:v1.14.6
+        image: k8s.gcr.io/cluster-autoscaler:v1.14.7
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
