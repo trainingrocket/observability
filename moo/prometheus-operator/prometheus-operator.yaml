@@ -6372,6 +6372,8 @@ spec:
     matchLabels:
       release: prometheus-operator
   portName: web
+  query:
+    maxSamples: 500000
   replicas: 1
   resources:
     limits:
@@ -6380,7 +6382,7 @@ spec:
     requests:
       cpu: 200m
       memory: 4Gi
-  retention: 2d
+  retention: 1d
   routePrefix: /
   ruleNamespaceSelector: {}
   ruleSelector:
@@ -6404,10 +6406,10 @@ spec:
     resources:
       limits:
         cpu: 1
-        memory: 256Mi
+        memory: 512Mi
       requests:
         cpu: 100m
-        memory: 256Mi
+        memory: 512Mi
     version: v0.8.1
   version: v2.13.1
 ---
