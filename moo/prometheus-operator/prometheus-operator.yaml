@@ -6378,10 +6378,10 @@ spec:
   resources:
     limits:
       cpu: 2
-      memory: 4Gi
+      memory: 6Gi
     requests:
       cpu: 200m
-      memory: 4Gi
+      memory: 6Gi
   retention: 1d
   routePrefix: /
   ruleNamespaceSelector: {}
