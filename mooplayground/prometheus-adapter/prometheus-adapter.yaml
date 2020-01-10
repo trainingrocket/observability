@@ -108,46 +108,46 @@ apiVersion: v1
 data:
   config.yaml: |
     rules:
-    - seriesQuery: '{__name__=~"^container_.*",container_name!="POD",namespace!="",pod_name!=""}'
+    - seriesQuery: '{__name__=~"^container_.*",container!="POD",namespace!="",pod!=""}'
       seriesFilters: []
       resources:
         overrides:
           namespace:
             resource: namespace
-          pod_name:
+          pod:
             resource: pod
       name:
         matches: ^container_(.*)_seconds_total$
         as: ""
-      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>,container_name!="POD"}[5m]))
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>,container!="POD"}[5m]))
         by (<<.GroupBy>>)
-    - seriesQuery: '{__name__=~"^container_.*",container_name!="POD",namespace!="",pod_name!=""}'
+    - seriesQuery: '{__name__=~"^container_.*",container!="POD",namespace!="",pod!=""}'
       seriesFilters:
       - isNot: ^container_.*_seconds_total$
       resources:
         overrides:
           namespace:
             resource: namespace
-          pod_name:
+          pod:
             resource: pod
       name:
         matches: ^container_(.*)_total$
         as: ""
-      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>,container_name!="POD"}[5m]))
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>,container!="POD"}[5m]))
         by (<<.GroupBy>>)
-    - seriesQuery: '{__name__=~"^container_.*",container_name!="POD",namespace!="",pod_name!=""}'
+    - seriesQuery: '{__name__=~"^container_.*",container!="POD",namespace!="",pod!=""}'
       seriesFilters:
       - isNot: ^container_.*_total$
       resources:
         overrides:
           namespace:
             resource: namespace
-          pod_name:
+          pod:
             resource: pod
       name:
         matches: ^container_(.*)$
         as: ""
-      metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>,container_name!="POD"}) by (<<.GroupBy>>)
+      metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>,container!="POD"}) by (<<.GroupBy>>)
     - seriesQuery: '{namespace!="",__name__!~"^container_.*"}'
       seriesFilters:
       - isNot: .*_total$
@@ -215,10 +215,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: e8fdf98c08e7d17dec56479dfad2723623d2a090cc116b7ced72e8b4fef28b74
+        checksum/config: 8a444b7df5b92b8912d44b1c85d22b9314fd80b30951276c56b2fadc1a869612
       labels:
         app: prometheus-adapter
-        chart: prometheus-adapter-1.4.0
+        chart: prometheus-adapter-2.0.0
         heritage: Tiller
         release: prometheus-adapter
       name: prometheus-adapter
@@ -289,7 +289,7 @@ kind: APIService
 metadata:
   labels:
     app: prometheus-adapter
-    chart: prometheus-adapter-1.4.0
+    chart: prometheus-adapter-2.0.0
     heritage: Tiller
     release: prometheus-adapter
   name: v1beta1.custom.metrics.k8s.io
