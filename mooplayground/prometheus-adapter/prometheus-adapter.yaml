@@ -215,10 +215,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 8a444b7df5b92b8912d44b1c85d22b9314fd80b30951276c56b2fadc1a869612
+        checksum/config: 4ffb90ed92375f692309f746243f4d2ea53c38ff46c0c40060070b2f09aaba10
       labels:
         app: prometheus-adapter
-        chart: prometheus-adapter-2.0.0
+        chart: prometheus-adapter-2.0.1
         heritage: Tiller
         release: prometheus-adapter
       name: prometheus-adapter
@@ -289,7 +289,7 @@ kind: APIService
 metadata:
   labels:
     app: prometheus-adapter
-    chart: prometheus-adapter-2.0.0
+    chart: prometheus-adapter-2.0.1
     heritage: Tiller
     release: prometheus-adapter
   name: v1beta1.custom.metrics.k8s.io
