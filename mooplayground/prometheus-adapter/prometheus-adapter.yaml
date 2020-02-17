@@ -215,10 +215,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 4ffb90ed92375f692309f746243f4d2ea53c38ff46c0c40060070b2f09aaba10
+        checksum/config: 5eefbd425cac654f715e4a4352a281e20f5a22645c42bc0bb43c36109fd804a8
       labels:
         app: prometheus-adapter
-        chart: prometheus-adapter-2.0.1
+        chart: prometheus-adapter-2.1.0
         heritage: Tiller
         release: prometheus-adapter
       name: prometheus-adapter
@@ -234,7 +234,7 @@ spec:
         - --metrics-relist-interval=1m
         - --v=4
         - --config=/etc/adapter/config.yaml
-        image: directxman12/k8s-prometheus-adapter-amd64:v0.5.0
+        image: directxman12/k8s-prometheus-adapter-amd64:v0.6.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -289,7 +289,7 @@ kind: APIService
 metadata:
   labels:
     app: prometheus-adapter
-    chart: prometheus-adapter-2.0.1
+    chart: prometheus-adapter-2.1.0
     heritage: Tiller
     release: prometheus-adapter
   name: v1beta1.custom.metrics.k8s.io
