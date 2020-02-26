@@ -198,7 +198,7 @@ kind: APIService
 metadata:
   labels:
     app: metrics-server
-    chart: metrics-server-2.9.0
+    chart: metrics-server-2.10.0
     heritage: Tiller
     release: metrics-server
   name: v1beta1.metrics.k8s.io
