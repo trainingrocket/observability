@@ -48,6 +48,7 @@ rules:
   - watch
 - apiGroups:
   - extensions
+  - policy
   resourceNames:
   - privileged-metrics-server
   resources:
@@ -55,7 +56,7 @@ rules:
   verbs:
   - use
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
@@ -198,7 +199,7 @@ kind: APIService
 metadata:
   labels:
     app: metrics-server
-    chart: metrics-server-2.10.0
+    chart: metrics-server-2.10.1
     heritage: Tiller
     release: metrics-server
   name: v1beta1.metrics.k8s.io
