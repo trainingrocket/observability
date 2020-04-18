@@ -152,7 +152,7 @@ spec:
         - --cert-dir=/tmp
         - --logtostderr
         - --secure-port=8443
-        image: gcr.io/google_containers/metrics-server-amd64:v0.3.6
+        image: k8s.gcr.io/metrics-server-amd64:v0.3.6
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -201,7 +201,7 @@ kind: APIService
 metadata:
   labels:
     app: metrics-server
-    chart: metrics-server-2.11.0
+    chart: metrics-server-2.11.1
     heritage: Tiller
     release: metrics-server
   name: v1beta1.metrics.k8s.io
