@@ -7,6 +7,18 @@ metadata:
   creationTimestamp: null
   name: alertmanagers.monitoring.coreos.com
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.version
+    description: The version of Alertmanager
+    name: Version
+    type: string
+  - JSONPath: .spec.replicas
+    description: The desired replicas number of Alertmanagers
+    name: Replicas
+    type: integer
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
   group: monitoring.coreos.com
   names:
     kind: Alertmanager
@@ -15,6 +27,7 @@ spec:
     singular: alertmanager
   preserveUnknownFields: false
   scope: Namespaced
+  subresources: {}
   validation:
     openAPIV3Schema:
       description: Alertmanager describes an Alertmanager cluster.
@@ -432,7 +445,7 @@ spec:
                               - key
                               type: object
                             fieldRef:
-                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP.'
+                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                               properties:
                                 apiVersion:
                                   description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -929,7 +942,7 @@ spec:
                             description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
                             type: string
                           runAsUserName:
-                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
                             type: string
                         type: object
                     type: object
@@ -1070,7 +1083,7 @@ spec:
                           description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
                           type: string
                         subPathExpr:
-                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is beta in 1.15.
+                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
                           type: string
                       required:
                       - mountPath
@@ -1145,7 +1158,7 @@ spec:
                               - key
                               type: object
                             fieldRef:
-                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP.'
+                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                               properties:
                                 apiVersion:
                                   description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -1642,7 +1655,7 @@ spec:
                             description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
                             type: string
                           runAsUserName:
-                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
                             type: string
                         type: object
                     type: object
@@ -1783,7 +1796,7 @@ spec:
                           description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
                           type: string
                         subPathExpr:
-                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is beta in 1.15.
+                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
                           type: string
                       required:
                       - mountPath
@@ -1815,7 +1828,18 @@ spec:
               description: If set to true all actions on the underlaying managed objects are not goint to be performed, except for delete actions.
               type: boolean
             podMetadata:
-              description: 'Standard object’s metadata. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata Metadata Labels and Annotations gets propagated to the prometheus pods.'
+              description: PodMetadata configures Labels and Annotations which are propagated to the alertmanager pods.
+              properties:
+                annotations:
+                  additionalProperties:
+                    type: string
+                  description: 'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: http://kubernetes.io/docs/user-guide/annotations'
+                  type: object
+                labels:
+                  additionalProperties:
+                    type: string
+                  description: 'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: http://kubernetes.io/docs/user-guide/labels'
+                  type: object
               type: object
             portName:
               description: Port name used for the pods and governing service. This defaults to web
@@ -1918,7 +1942,7 @@ spec:
                       description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
                       type: string
                     runAsUserName:
-                      description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+                      description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
                       type: string
                   type: object
               type: object
@@ -2129,7 +2153,7 @@ spec:
                     description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
                     type: string
                   subPathExpr:
-                    description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is beta in 1.15.
+                    description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
                     type: string
                 required:
                 - mountPath
@@ -3069,7 +3093,7 @@ spec:
                     description: HTTP path to scrape for metrics.
                     type: string
                   port:
-                    description: Name of the port this endpoint refers to. Mutually exclusive with targetPort.
+                    description: Name of the pod port this endpoint refers to. Mutually exclusive with targetPort.
                     type: string
                   proxyUrl:
                     description: ProxyURL eg http://proxyserver:2195 Directs scrapes to proxy through this endpoint.
@@ -3115,7 +3139,7 @@ spec:
                     anyOf:
                     - type: integer
                     - type: string
-                    description: Name or number of the target port of the endpoint. Mutually exclusive with port.
+                    description: 'Deprecated: Use ''port'' instead.'
                     x-kubernetes-int-or-string: true
                 type: object
               type: array
@@ -3180,6 +3204,18 @@ metadata:
   creationTimestamp: null
   name: prometheuses.monitoring.coreos.com
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.version
+    description: The version of Prometheus
+    name: Version
+    type: string
+  - JSONPath: .spec.replicas
+    description: The desired replicas number of Prometheuses
+    name: Replicas
+    type: integer
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
   group: monitoring.coreos.com
   names:
     kind: Prometheus
@@ -3188,6 +3224,7 @@ spec:
     singular: prometheus
   preserveUnknownFields: false
   scope: Namespaced
+  subresources: {}
   validation:
     openAPIV3Schema:
       description: Prometheus defines a Prometheus deployment.
@@ -3942,7 +3979,7 @@ spec:
                               - key
                               type: object
                             fieldRef:
-                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP.'
+                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                               properties:
                                 apiVersion:
                                   description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -4439,7 +4476,7 @@ spec:
                             description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
                             type: string
                           runAsUserName:
-                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
                             type: string
                         type: object
                     type: object
@@ -4580,7 +4617,7 @@ spec:
                           description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
                           type: string
                         subPathExpr:
-                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is beta in 1.15.
+                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
                           type: string
                       required:
                       - mountPath
@@ -4675,7 +4712,7 @@ spec:
                               - key
                               type: object
                             fieldRef:
-                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP.'
+                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                               properties:
                                 apiVersion:
                                   description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -5172,7 +5209,7 @@ spec:
                             description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
                             type: string
                           runAsUserName:
-                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
                             type: string
                         type: object
                     type: object
@@ -5313,7 +5350,7 @@ spec:
                           description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
                           type: string
                         subPathExpr:
-                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is beta in 1.15.
+                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
                           type: string
                       required:
                       - mountPath
@@ -5351,7 +5388,18 @@ spec:
               description: When a Prometheus deployment is paused, no actions except for deletion will be performed on the underlying objects.
               type: boolean
             podMetadata:
-              description: 'Standard object’s metadata. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata Metadata Labels and Annotations gets propagated to the prometheus pods.'
+              description: PodMetadata configures Labels and Annotations which are propagated to the prometheus pods.
+              properties:
+                annotations:
+                  additionalProperties:
+                    type: string
+                  description: 'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: http://kubernetes.io/docs/user-guide/annotations'
+                  type: object
+                labels:
+                  additionalProperties:
+                    type: string
+                  description: 'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: http://kubernetes.io/docs/user-guide/labels'
+                  type: object
               type: object
             podMonitorNamespaceSelector:
               description: Namespaces to be selected for PodMonitor discovery. If nil, only check own namespace.
@@ -6008,7 +6056,7 @@ spec:
                       description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
                       type: string
                     runAsUserName:
-                      description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+                      description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
                       type: string
                   type: object
               type: object
@@ -6238,6 +6286,108 @@ spec:
                 baseImage:
                   description: Thanos base image if other than default.
                   type: string
+                grpcServerTlsConfig:
+                  description: 'GRPCServerTLSConfig configures the gRPC server from which Thanos Querier reads recorded rule data. Note: Currently only the CAFile, CertFile, and KeyFile fields are supported. Maps to the ''--grpc-server-tls-*'' CLI args.'
+                  properties:
+                    ca:
+                      description: Stuct containing the CA cert to use for the targets.
+                      properties:
+                        configMap:
+                          description: ConfigMap containing data to use for the targets.
+                          properties:
+                            key:
+                              description: The key to select.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the ConfigMap or its key must be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                        secret:
+                          description: Secret containing data to use for the targets.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    caFile:
+                      description: Path to the CA cert in the Prometheus container to use for the targets.
+                      type: string
+                    cert:
+                      description: Struct containing the client cert file for the targets.
+                      properties:
+                        configMap:
+                          description: ConfigMap containing data to use for the targets.
+                          properties:
+                            key:
+                              description: The key to select.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the ConfigMap or its key must be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                        secret:
+                          description: Secret containing data to use for the targets.
+                          properties:
+                            key:
+                              description: The key of the secret to select from.  Must be a valid secret key.
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                              type: string
+                            optional:
+                              description: Specify whether the Secret or its key must be defined
+                              type: boolean
+                          required:
+                          - key
+                          type: object
+                      type: object
+                    certFile:
+                      description: Path to the client cert file in the Prometheus container for the targets.
+                      type: string
+                    insecureSkipVerify:
+                      description: Disable target certificate validation.
+                      type: boolean
+                    keyFile:
+                      description: Path to the client key file in the Prometheus container for the targets.
+                      type: string
+                    keySecret:
+                      description: Secret containing the client key file for the targets.
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    serverName:
+                      description: Used to verify the hostname for the targets.
+                      type: string
+                  type: object
                 image:
                   description: Image if specified has precedence over baseImage, tag and sha combinations. Specifying the version is still necessary to ensure the Prometheus Operator knows what version of Thanos is being configured.
                   type: string
@@ -6279,6 +6429,21 @@ spec:
                 tag:
                   description: Tag of Thanos sidecar container image to be deployed. Defaults to the value of `version`. Version is ignored if Tag is set.
                   type: string
+                tracingConfig:
+                  description: TracingConfig configures tracing in Thanos. This is an experimental feature, it may change in any upcoming release in a breaking way.
+                  properties:
+                    key:
+                      description: The key of the secret to select from.  Must be a valid secret key.
+                      type: string
+                    name:
+                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                      type: string
+                    optional:
+                      description: Specify whether the Secret or its key must be defined
+                      type: boolean
+                  required:
+                  - key
+                  type: object
                 version:
                   description: Version describes the version of Thanos to use.
                   type: string
@@ -6309,6 +6474,34 @@ spec:
             version:
               description: Version of Prometheus to be deployed.
               type: string
+            volumeMounts:
+              description: VolumeMounts allows configuration of additional VolumeMounts on the output StatefulSet definition. VolumeMounts specified will be appended to other VolumeMounts in the prometheus container, that are generated as a result of StorageSpec objects.
+              items:
+                description: VolumeMount describes a mounting of a Volume within a container.
+                properties:
+                  mountPath:
+                    description: Path within the container at which the volume should be mounted.  Must not contain ':'.
+                    type: string
+                  mountPropagation:
+                    description: mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10.
+                    type: string
+                  name:
+                    description: This must match the Name of a Volume.
+                    type: string
+                  readOnly:
+                    description: Mounted read-only if true, read-write otherwise (false or unspecified). Defaults to false.
+                    type: boolean
+                  subPath:
+                    description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
+                    type: string
+                  subPathExpr:
+                    description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
+                    type: string
+                required:
+                - mountPath
+                - name
+                type: object
+              type: array
             volumes:
               description: Volumes allows configuration of additional volumes on the output StatefulSet definition. Volumes specified will be appended to other volumes that are generated as a result of StorageSpec objects.
               items:
@@ -7177,11 +7370,13 @@ spec:
             groups:
               description: Content of Prometheus rule file
               items:
-                description: RuleGroup is a list of sequentially evaluated recording and alerting rules.
+                description: 'RuleGroup is a list of sequentially evaluated recording and alerting rules. Note: PartialResponseStrategy is only used by ThanosRuler and will be ignored by Prometheus instances.  Valid values for this field are ''warn'' or ''abort''.  More info: https://github.com/thanos-io/thanos/blob/master/docs/components/rule.md#partial-response'
                 properties:
                   interval:
                     type: string
                   name:
+                    type: string
+                  partial_response_strategy:
                     type: string
                   rules:
                     items:
@@ -7411,7 +7606,7 @@ spec:
                     anyOf:
                     - type: integer
                     - type: string
-                    description: Name or number of the target port of the endpoint. Mutually exclusive with port.
+                    description: Name or number of the pod port this endpoint refers to. Mutually exclusive with port.
                     x-kubernetes-int-or-string: true
                   tlsConfig:
                     description: TLS configuration to use when scraping the endpoint
@@ -7594,7 +7789,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.4
-    helm.sh/hook: crd-install
+    helm.sh/hook: crd-instal
   creationTimestamp: null
   name: thanosrulers.monitoring.coreos.com
 spec:
@@ -7621,11 +7816,355 @@ spec:
         spec:
           description: 'Specification of the desired behavior of the ThanosRuler cluster. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
           properties:
+            affinity:
+              description: If specified, the pod's scheduling constraints.
+              properties:
+                nodeAffinity:
+                  description: Describes node affinity scheduling rules for the pod.
+                  properties:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      description: The scheduler will prefer to schedule pods to nodes that satisfy the affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node matches the corresponding matchExpressions; the node(s) with the highest sum are the most preferred.
+                      items:
+                        description: An empty preferred scheduling term matches all objects with implicit weight 0 (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
+                        properties:
+                          preference:
+                            description: A node selector term, associated with the corresponding weight.
+                            properties:
+                              matchExpressions:
+                                description: A list of node selector requirements by node's labels.
+                                items:
+                                  description: A node selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                  properties:
+                                    key:
+                                      description: The label key that the selector applies to.
+                                      type: string
+                                    operator:
+                                      description: Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+                                      type: string
+                                    values:
+                                      description: An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                  - key
+                                  - operator
+                                  type: object
+                                type: array
+                              matchFields:
+                                description: A list of node selector requirements by node's fields.
+                                items:
+                                  description: A node selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                  properties:
+                                    key:
+                                      description: The label key that the selector applies to.
+                                      type: string
+                                    operator:
+                                      description: Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+                                      type: string
+                                    values:
+                                      description: An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                  - key
+                                  - operator
+                                  type: object
+                                type: array
+                            type: object
+                          weight:
+                            description: Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+                            format: int32
+                            type: integer
+                        required:
+                        - preference
+                        - weight
+                        type: object
+                      type: array
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      description: If the affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to an update), the system may or may not try to eventually evict the pod from its node.
+                      properties:
+                        nodeSelectorTerms:
+                          description: Required. A list of node selector terms. The terms are ORed.
+                          items:
+                            description: A null or empty node selector term matches no objects. The requirements of them are ANDed. The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+                            properties:
+                              matchExpressions:
+                                description: A list of node selector requirements by node's labels.
+                                items:
+                                  description: A node selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                  properties:
+                                    key:
+                                      description: The label key that the selector applies to.
+                                      type: string
+                                    operator:
+                                      description: Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+                                      type: string
+                                    values:
+                                      description: An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                  - key
+                                  - operator
+                                  type: object
+                                type: array
+                              matchFields:
+                                description: A list of node selector requirements by node's fields.
+                                items:
+                                  description: A node selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                  properties:
+                                    key:
+                                      description: The label key that the selector applies to.
+                                      type: string
+                                    operator:
+                                      description: Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+                                      type: string
+                                    values:
+                                      description: An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                  - key
+                                  - operator
+                                  type: object
+                                type: array
+                            type: object
+                          type: array
+                      required:
+                      - nodeSelectorTerms
+                      type: object
+                  type: object
+                podAffinity:
+                  description: Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+                  properties:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      description: The scheduler will prefer to schedule pods to nodes that satisfy the affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the node(s) with the highest sum are the most preferred.
+                      items:
+                        description: The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+                        properties:
+                          podAffinityTerm:
+                            description: Required. A pod affinity term, associated with the corresponding weight.
+                            properties:
+                              labelSelector:
+                                description: A label query over a set of resources, in this case pods.
+                                properties:
+                                  matchExpressions:
+                                    description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                                    items:
+                                      description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                      properties:
+                                        key:
+                                          description: key is the label key that the selector applies to.
+                                          type: string
+                                        operator:
+                                          description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                                          type: string
+                                        values:
+                                          description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                                          items:
+                                            type: string
+                                          type: array
+                                      required:
+                                      - key
+                                      - operator
+                                      type: object
+                                    type: array
+                                  matchLabels:
+                                    additionalProperties:
+                                      type: string
+                                    description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                    type: object
+                                type: object
+                              namespaces:
+                                description: namespaces specifies which namespaces the labelSelector applies to (matches against); null or empty list means "this pod's namespace"
+                                items:
+                                  type: string
+                                type: array
+                              topologyKey:
+                                description: This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
+                                type: string
+                            required:
+                            - topologyKey
+                            type: object
+                          weight:
+                            description: weight associated with matching the corresponding podAffinityTerm, in the range 1-100.
+                            format: int32
+                            type: integer
+                        required:
+                        - podAffinityTerm
+                        - weight
+                        type: object
+                      type: array
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      description: If the affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to a pod label update), the system may or may not try to eventually evict the pod from its node. When there are multiple elements, the lists of nodes corresponding to each podAffinityTerm are intersected, i.e. all terms must be satisfied.
+                      items:
+                        description: Defines a set of pods (namely those matching the labelSelector relative to the given namespace(s)) that this pod should be co-located (affinity) or not co-located (anti-affinity) with, where co-located is defined as running on a node whose value of the label with key <topologyKey> matches that of any node on which a pod of the set of pods is running
+                        properties:
+                          labelSelector:
+                            description: A label query over a set of resources, in this case pods.
+                            properties:
+                              matchExpressions:
+                                description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                                items:
+                                  description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                  properties:
+                                    key:
+                                      description: key is the label key that the selector applies to.
+                                      type: string
+                                    operator:
+                                      description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                                      type: string
+                                    values:
+                                      description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                  - key
+                                  - operator
+                                  type: object
+                                type: array
+                              matchLabels:
+                                additionalProperties:
+                                  type: string
+                                description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                type: object
+                            type: object
+                          namespaces:
+                            description: namespaces specifies which namespaces the labelSelector applies to (matches against); null or empty list means "this pod's namespace"
+                            items:
+                              type: string
+                            type: array
+                          topologyKey:
+                            description: This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
+                            type: string
+                        required:
+                        - topologyKey
+                        type: object
+                      type: array
+                  type: object
+                podAntiAffinity:
+                  description: Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+                  properties:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      description: The scheduler will prefer to schedule pods to nodes that satisfy the anti-affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling anti-affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the node(s) with the highest sum are the most preferred.
+                      items:
+                        description: The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+                        properties:
+                          podAffinityTerm:
+                            description: Required. A pod affinity term, associated with the corresponding weight.
+                            properties:
+                              labelSelector:
+                                description: A label query over a set of resources, in this case pods.
+                                properties:
+                                  matchExpressions:
+                                    description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                                    items:
+                                      description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                      properties:
+                                        key:
+                                          description: key is the label key that the selector applies to.
+                                          type: string
+                                        operator:
+                                          description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                                          type: string
+                                        values:
+                                          description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                                          items:
+                                            type: string
+                                          type: array
+                                      required:
+                                      - key
+                                      - operator
+                                      type: object
+                                    type: array
+                                  matchLabels:
+                                    additionalProperties:
+                                      type: string
+                                    description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                    type: object
+                                type: object
+                              namespaces:
+                                description: namespaces specifies which namespaces the labelSelector applies to (matches against); null or empty list means "this pod's namespace"
+                                items:
+                                  type: string
+                                type: array
+                              topologyKey:
+                                description: This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
+                                type: string
+                            required:
+                            - topologyKey
+                            type: object
+                          weight:
+                            description: weight associated with matching the corresponding podAffinityTerm, in the range 1-100.
+                            format: int32
+                            type: integer
+                        required:
+                        - podAffinityTerm
+                        - weight
+                        type: object
+                      type: array
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      description: If the anti-affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the anti-affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to a pod label update), the system may or may not try to eventually evict the pod from its node. When there are multiple elements, the lists of nodes corresponding to each podAffinityTerm are intersected, i.e. all terms must be satisfied.
+                      items:
+                        description: Defines a set of pods (namely those matching the labelSelector relative to the given namespace(s)) that this pod should be co-located (affinity) or not co-located (anti-affinity) with, where co-located is defined as running on a node whose value of the label with key <topologyKey> matches that of any node on which a pod of the set of pods is running
+                        properties:
+                          labelSelector:
+                            description: A label query over a set of resources, in this case pods.
+                            properties:
+                              matchExpressions:
+                                description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                                items:
+                                  description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+                                  properties:
+                                    key:
+                                      description: key is the label key that the selector applies to.
+                                      type: string
+                                    operator:
+                                      description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+                                      type: string
+                                    values:
+                                      description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                  - key
+                                  - operator
+                                  type: object
+                                type: array
+                              matchLabels:
+                                additionalProperties:
+                                  type: string
+                                description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                type: object
+                            type: object
+                          namespaces:
+                            description: namespaces specifies which namespaces the labelSelector applies to (matches against); null or empty list means "this pod's namespace"
+                            items:
+                              type: string
+                            type: array
+                          topologyKey:
+                            description: This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
+                            type: string
+                        required:
+                        - topologyKey
+                        type: object
+                      type: array
+                  type: object
+              type: object
             alertDropLabels:
               description: AlertDropLabels configure the label names which should be dropped in ThanosRuler alerts. If `labels` field is not provided, `thanos_ruler_replica` will be dropped in alerts by default.
               items:
                 type: string
               type: array
+            alertQueryUrl:
+              description: The external Query URL the Thanos Ruler will set in the 'Source' field of all alerts. Maps to the '--alert.query-url' CLI arg.
+              type: string
             alertmanagersConfig:
               description: Define configuration for connecting to alertmanager.  Only available with thanos v0.10.0 and higher.  Maps to the `alertmanagers.config` arg.
               properties:
@@ -7642,8 +8181,10 @@ spec:
               - key
               type: object
             alertmanagersUrl:
-              description: Define URL to send alerts to alertmanager.  For Thanos v0.10.0 and higher, AlertManagersConfig should be used instead. Maps to the `alertmanagers.url` arg.
-              type: string
+              description: 'Define URLs to send alerts to Alertmanager.  For Thanos v0.10.0 and higher, AlertManagersConfig should be used instead.  Note: this field will be ignored if AlertManagersConfig is specified. Maps to the `alertmanagers.url` arg.'
+              items:
+                type: string
+              type: array
             containers:
               description: 'Containers allows injecting additional containers or modifying operator generated containers. This can be used to allow adding an authentication proxy to a ThanosRuler pod or to change the behavior of an operator generated container. Containers described here modify an operator generated container if they share the same name and modifications are done via a strategic merge patch. The current container names are: `thanos-ruler` and `rules-configmap-reloader`. Overriding containers is entirely outside the scope of what the maintainers will support and by doing so, you accept that this behaviour may break at any time without notice.'
               items:
@@ -7689,7 +8230,7 @@ spec:
                               - key
                               type: object
                             fieldRef:
-                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP.'
+                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                               properties:
                                 apiVersion:
                                   description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -8186,7 +8727,7 @@ spec:
                             description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
                             type: string
                           runAsUserName:
-                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
                             type: string
                         type: object
                     type: object
@@ -8327,7 +8868,7 @@ spec:
                           description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
                           type: string
                         subPathExpr:
-                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is beta in 1.15.
+                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
                           type: string
                       required:
                       - mountPath
@@ -8347,6 +8888,111 @@ spec:
             evaluationInterval:
               description: Interval between consecutive evaluations.
               type: string
+            externalPrefix:
+              description: The external URL the Thanos Ruler instances will be available under. This is necessary to generate correct URLs. This is necessary if Thanos Ruler is not served from root of a DNS name.
+              type: string
+            grpcServerTlsConfig:
+              description: 'GRPCServerTLSConfig configures the gRPC server from which Thanos Querier reads recorded rule data. Note: Currently only the CAFile, CertFile, and KeyFile fields are supported. Maps to the ''--grpc-server-tls-*'' CLI args.'
+              properties:
+                ca:
+                  description: Stuct containing the CA cert to use for the targets.
+                  properties:
+                    configMap:
+                      description: ConfigMap containing data to use for the targets.
+                      properties:
+                        key:
+                          description: The key to select.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the ConfigMap or its key must be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    secret:
+                      description: Secret containing data to use for the targets.
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                  type: object
+                caFile:
+                  description: Path to the CA cert in the Prometheus container to use for the targets.
+                  type: string
+                cert:
+                  description: Struct containing the client cert file for the targets.
+                  properties:
+                    configMap:
+                      description: ConfigMap containing data to use for the targets.
+                      properties:
+                        key:
+                          description: The key to select.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the ConfigMap or its key must be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    secret:
+                      description: Secret containing data to use for the targets.
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                  type: object
+                certFile:
+                  description: Path to the client cert file in the Prometheus container for the targets.
+                  type: string
+                insecureSkipVerify:
+                  description: Disable target certificate validation.
+                  type: boolean
+                keyFile:
+                  description: Path to the client key file in the Prometheus container for the targets.
+                  type: string
+                keySecret:
+                  description: Secret containing the client key file for the targets.
+                  properties:
+                    key:
+                      description: The key of the secret to select from.  Must be a valid secret key.
+                      type: string
+                    name:
+                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                      type: string
+                    optional:
+                      description: Specify whether the Secret or its key must be defined
+                      type: boolean
+                  required:
+                  - key
+                  type: object
+                serverName:
+                  description: Used to verify the hostname for the targets.
+                  type: string
+              type: object
             image:
               description: Thanos container image URL.
               type: string
@@ -8405,7 +9051,7 @@ spec:
                               - key
                               type: object
                             fieldRef:
-                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP.'
+                              description: 'Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.'
                               properties:
                                 apiVersion:
                                   description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -8902,7 +9548,7 @@ spec:
                             description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
                             type: string
                           runAsUserName:
-                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+                            description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
                             type: string
                         type: object
                     type: object
@@ -9043,7 +9689,7 @@ spec:
                           description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
                           type: string
                         subPathExpr:
-                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is beta in 1.15.
+                          description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
                           type: string
                       required:
                       - mountPath
@@ -9071,6 +9717,11 @@ spec:
             logLevel:
               description: Log level for ThanosRuler to be configured with.
               type: string
+            nodeSelector:
+              additionalProperties:
+                type: string
+              description: Define which Nodes the Pods are scheduled on.
+              type: object
             objectStorageConfig:
               description: ObjectStorageConfig configures object storage in Thanos.
               properties:
@@ -9090,11 +9741,40 @@ spec:
               description: When a ThanosRuler deployment is paused, no actions except for deletion will be performed on the underlying objects.
               type: boolean
             podMetadata:
-              description: 'Standard object’s metadata. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata Metadata Labels and Annotations gets propagated to the prometheus pods.'
+              description: PodMetadata contains Labels and Annotations gets propagated to the thanos ruler pods.
+              properties:
+                annotations:
+                  additionalProperties:
+                    type: string
+                  description: 'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: http://kubernetes.io/docs/user-guide/annotations'
+                  type: object
+                labels:
+                  additionalProperties:
+                    type: string
+                  description: 'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: http://kubernetes.io/docs/user-guide/labels'
+                  type: object
               type: object
             portName:
               description: Port name used for the pods and governing service. This defaults to web
               type: string
+            priorityClassName:
+              description: Priority class assigned to the Pods
+              type: string
+            queryConfig:
+              description: Define configuration for connecting to thanos query instances. If this is defined, the QueryEndpoints field will be ignored. Maps to the `query.config` CLI argument. Only available with thanos v0.11.0 and higher.
+              properties:
+                key:
+                  description: The key of the secret to select from.  Must be a valid secret key.
+                  type: string
+                name:
+                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                  type: string
+                optional:
+                  description: Specify whether the Secret or its key must be defined
+                  type: boolean
+              required:
+              - key
+              type: object
             queryEndpoints:
               description: QueryEndpoints defines Thanos querier endpoints from which to query metrics. Maps to the --query flag of thanos ruler.
               items:
@@ -9105,7 +9785,7 @@ spec:
               format: int32
               type: integer
             resources:
-              description: Resources defines the resource requirements for the Thanos sidecar. If not provided, no requests/limits will be set
+              description: Resources defines the resource requirements for single Pods. If not provided, no requests/limits will be set
               properties:
                 limits:
                   additionalProperties:
@@ -9120,6 +9800,9 @@ spec:
               type: object
             retention:
               description: Time duration ThanosRuler shall retain data for. Default is '24h', and must match the regular expression `[0-9]+(ms|s|m|h|d|w|y)` (milliseconds seconds minutes hours days weeks years).
+              type: string
+            routePrefix:
+              description: The route prefix ThanosRuler registers HTTP handlers for. This allows thanos UI to be served on a sub-path.
               type: string
             ruleNamespaceSelector:
               description: Namespaces to be selected for Rules discovery. If unspecified, only the same namespace as the ThanosRuler object is in is used.
@@ -9181,6 +9864,79 @@ spec:
                   description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                   type: object
               type: object
+            securityContext:
+              description: SecurityContext holds pod-level security attributes and common container settings. This defaults to the default PodSecurityContext.
+              properties:
+                fsGroup:
+                  description: "A special supplemental group that applies to all containers in a pod. Some volume types allow the Kubelet to change the ownership of that volume to be owned by the pod: \n 1. The owning GID will be the FSGroup 2. The setgid bit is set (new files created in the volume will be owned by FSGroup) 3. The permission bits are OR'd with rw-rw---- \n If unset, the Kubelet will not modify the ownership and permissions of any volume."
+                  format: int64
+                  type: integer
+                runAsGroup:
+                  description: The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
+                  format: int64
+                  type: integer
+                runAsNonRoot:
+                  description: Indicates that the container must run as a non-root user. If true, the Kubelet will validate the image at runtime to ensure that it does not run as UID 0 (root) and fail to start the container if it does. If unset or false, no such validation will be performed. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+                  type: boolean
+                runAsUser:
+                  description: The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
+                  format: int64
+                  type: integer
+                seLinuxOptions:
+                  description: The SELinux context to be applied to all containers. If unspecified, the container runtime will allocate a random SELinux context for each container.  May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
+                  properties:
+                    level:
+                      description: Level is SELinux level label that applies to the container.
+                      type: string
+                    role:
+                      description: Role is a SELinux role label that applies to the container.
+                      type: string
+                    type:
+                      description: Type is a SELinux type label that applies to the container.
+                      type: string
+                    user:
+                      description: User is a SELinux user label that applies to the container.
+                      type: string
+                  type: object
+                supplementalGroups:
+                  description: A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container.
+                  items:
+                    format: int64
+                    type: integer
+                  type: array
+                sysctls:
+                  description: Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch.
+                  items:
+                    description: Sysctl defines a kernel parameter to be set
+                    properties:
+                      name:
+                        description: Name of a property to set
+                        type: string
+                      value:
+                        description: Value of a property to set
+                        type: string
+                    required:
+                    - name
+                    - value
+                    type: object
+                  type: array
+                windowsOptions:
+                  description: The Windows specific settings applied to all containers. If unspecified, the options within a container's SecurityContext will be used. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+                  properties:
+                    gmsaCredentialSpec:
+                      description: GMSACredentialSpec is where the GMSA admission webhook (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the GMSA credential spec named by the GMSACredentialSpecName field. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
+                      type: string
+                    gmsaCredentialSpecName:
+                      description: GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
+                      type: string
+                    runAsUserName:
+                      description: The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
+                      type: string
+                  type: object
+              type: object
+            serviceAccountName:
+              description: ServiceAccountName is the name of the ServiceAccount to use to run the Thanos Ruler Pods.
+              type: string
             storage:
               description: Storage spec to specify how storage shall be used.
               properties:
@@ -9332,6 +10088,29 @@ spec:
                       type: object
                   type: object
               type: object
+            tolerations:
+              description: If specified, the pod's tolerations.
+              items:
+                description: The pod this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.
+                properties:
+                  effect:
+                    description: Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+                    type: string
+                  key:
+                    description: Key is the taint key that the toleration applies to. Empty means match all taint keys. If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+                    type: string
+                  operator:
+                    description: Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.
+                    type: string
+                  tolerationSeconds:
+                    description: TolerationSeconds represents the period of time the toleration (which must be of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default, it is not set, which means tolerate the taint forever (do not evict). Zero and negative values will be treated as 0 (evict immediately) by the system.
+                    format: int64
+                    type: integer
+                  value:
+                    description: Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
+                    type: string
+                type: object
+              type: array
             tracingConfig:
               description: TracingConfig configures tracing in Thanos. This is an experimental feature, it may change in any upcoming release in a breaking way.
               properties:
@@ -10138,8 +10917,6 @@ spec:
                 - name
                 type: object
               type: array
-          required:
-          - queryEndpoints
           type: object
         status:
           description: 'Most recent observed status of the ThanosRuler cluster. Read-only. Not included when requesting from the apiserver, only from the ThanosRuler Operator API itself. More info: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
@@ -10286,7 +11063,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.6.4
+    helm.sh/chart: kube-state-metrics-2.8.2
   name: prometheus-operator-kube-state-metrics
   namespace: monitoring
 ---
@@ -10605,25 +11382,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    app.kubernetes.io/instance: prometheus-operator
-    app.kubernetes.io/managed-by: Tiller
-    app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.6.4
-  name: psp-prometheus-operator-kube-state-metrics
-rules:
-- apiGroups:
-  - extensions
-  resourceNames:
-  - prometheus-operator-kube-state-metrics
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
     app: prometheus-node-exporter
     jobLabel: node-exporter
     release: prometheus-operator
@@ -10645,7 +11403,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.6.4
+    helm.sh/chart: kube-state-metrics-2.8.2
   name: prometheus-operator-kube-state-metrics
 rules:
 - apiGroups:
@@ -10722,9 +11480,23 @@ rules:
   - list
   - watch
 - apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - list
+  - watch
+- apiGroups:
   - ""
   resources:
   - namespaces
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
   verbs:
   - list
   - watch
@@ -10810,6 +11582,27 @@ rules:
   - storage.k8s.io
   resources:
   - storageclasses
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - volumeattachments
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - autoscaling.k8s.io
+  resources:
+  - verticalpodautoscalers
   verbs:
   - list
   - watch
@@ -10998,24 +11791,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    app.kubernetes.io/instance: prometheus-operator
-    app.kubernetes.io/managed-by: Tiller
-    app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.6.4
-  name: psp-prometheus-operator-kube-state-metrics
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: psp-prometheus-operator-kube-state-metrics
-subjects:
-- kind: ServiceAccount
-  name: prometheus-operator-kube-state-metrics
-  namespace: monitoring
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
     app: prometheus-node-exporter
     jobLabel: node-exporter
     release: prometheus-operator
@@ -11036,7 +11811,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.6.4
+    helm.sh/chart: kube-state-metrics-2.8.2
   name: prometheus-operator-kube-state-metrics
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -11333,7 +12108,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.6.4
+    helm.sh/chart: kube-state-metrics-2.8.2
   name: prometheus-operator-kube-state-metrics
   namespace: monitoring
 spec:
@@ -11555,7 +12330,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.6.4
+    helm.sh/chart: kube-state-metrics-2.8.2
   name: prometheus-operator-kube-state-metrics
   namespace: monitoring
 spec:
@@ -11581,7 +12356,9 @@ spec:
         - --collectors=ingresses
         - --collectors=jobs
         - --collectors=limitranges
+        - --collectors=mutatingwebhookconfigurations
         - --collectors=namespaces
+        - --collectors=networkpolicies
         - --collectors=nodes
         - --collectors=persistentvolumeclaims
         - --collectors=persistentvolumes
@@ -11594,7 +12371,10 @@ spec:
         - --collectors=services
         - --collectors=statefulsets
         - --collectors=storageclasses
-        image: quay.io/coreos/kube-state-metrics:v1.9.4
+        - --collectors=validatingwebhookconfigurations
+        - --collectors=verticalpodautoscalers
+        - --collectors=volumeattachments
+        image: quay.io/coreos/kube-state-metrics:v1.9.5
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -11635,7 +12415,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-operator
-        chart: prometheus-operator-8.12.14
+        chart: prometheus-operator-8.12.15
         heritage: Tiller
         release: prometheus-operator
     spec:
@@ -11645,11 +12425,11 @@ spec:
         - --kubelet-service=kube-system/prometheus-operator-kubelet
         - --logtostderr=true
         - --localhost=127.0.0.1
-        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.37.0
+        - --prometheus-config-reloader=quay.io/coreos/prometheus-config-reloader:v0.38.1
         - --config-reloader-image=quay.io/coreos/configmap-reload:v0.0.1
         - --config-reloader-cpu=100m
         - --config-reloader-memory=25Mi
-        image: quay.io/coreos/prometheus-operator:v0.37.0
+        image: quay.io/coreos/prometheus-operator:v0.38.1
         imagePullPolicy: IfNotPresent
         name: prometheus-operator
         ports:
@@ -11783,7 +12563,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-admission-create
-        chart: prometheus-operator-8.12.14
+        chart: prometheus-operator-8.12.15
         heritage: Tiller
         release: prometheus-operator
       name: prometheus-operator-admission-create
@@ -11794,7 +12574,7 @@ spec:
         - --host=prometheus-operator-operator,prometheus-operator-operator.monitoring.svc
         - --namespace=monitoring
         - --secret-name=prometheus-operator-admission
-        image: jettech/kube-webhook-certgen:v1.0.0
+        image: jettech/kube-webhook-certgen:v1.2.0
         imagePullPolicy: null
         name: create
         resources: {}
@@ -11820,7 +12600,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-admission-patch
-        chart: prometheus-operator-8.12.14
+        chart: prometheus-operator-8.12.15
         heritage: Tiller
         release: prometheus-operator
       name: prometheus-operator-admission-patch
@@ -11832,7 +12612,7 @@ spec:
         - --namespace=monitoring
         - --secret-name=prometheus-operator-admission
         - --patch-failure-policy=Fail
-        image: jettech/kube-webhook-certgen:v1.0.0
+        image: jettech/kube-webhook-certgen:v1.2.0
         imagePullPolicy: null
         name: patch
         resources: {}
@@ -11931,7 +12711,7 @@ kind: Alertmanager
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -11959,7 +12739,7 @@ kind: Prometheus
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -12017,14 +12797,14 @@ spec:
         cpu: 100m
         memory: 256Mi
     version: v0.8.1
-  version: v2.15.2
+  version: v2.16.0
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: helm-exporter
@@ -12057,7 +12837,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: nginx-ingress-controller-metrics
@@ -12090,7 +12870,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -12113,7 +12893,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-apiserver
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-apiserver
@@ -12141,7 +12921,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-coredns
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-coredns
@@ -12164,7 +12944,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-grafana
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-grafana
@@ -12186,7 +12966,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-controller-manager
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-controller-manager
@@ -12209,7 +12989,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-etcd
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-etcd
@@ -12232,7 +13012,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-proxy
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-proxy
@@ -12255,7 +13035,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-scheduler
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler
@@ -12278,7 +13058,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-state-metrics
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-state-metrics
@@ -12298,7 +13078,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kubelet
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubelet
@@ -12341,7 +13121,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-node-exporter
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-exporter
@@ -12360,7 +13140,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-operator
@@ -12382,7 +13162,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -12405,7 +13185,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.12.14
+    chart: prometheus-operator-8.12.15
     heritage: Tiller
     release: prometheus-operator
   name: velero-metrics
@@ -12711,7 +13491,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.6.4
+    helm.sh/chart: kube-state-metrics-2.8.2
   name: prometheus-operator-kube-state-metrics
 spec:
   fsGroup:
