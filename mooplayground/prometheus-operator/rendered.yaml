@@ -11039,7 +11039,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-test
   namespace: monitoring
 ---
@@ -11051,7 +11051,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana
   namespace: monitoring
 ---
@@ -11143,7 +11143,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-test
   namespace: monitoring
 rules:
@@ -11164,7 +11164,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana
   namespace: monitoring
 rules:
@@ -11213,7 +11213,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-clusterrole
 rules:
 - apiGroups:
@@ -11671,7 +11671,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-test
   namespace: monitoring
 roleRef:
@@ -11691,7 +11691,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana
   namespace: monitoring
 roleRef:
@@ -11731,7 +11731,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-clusterrolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -11879,7 +11879,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-config-dashboards
   namespace: monitoring
 ---
@@ -11918,7 +11918,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-test
   namespace: monitoring
 ---
@@ -11962,7 +11962,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
     release: prometheus-operator
   name: prometheus-operator-grafana
   namespace: monitoring
@@ -11990,7 +11990,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana
   namespace: monitoring
 type: Opaque
@@ -12122,7 +12122,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana
   namespace: monitoring
 spec:
@@ -12235,7 +12235,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana
   namespace: monitoring
 spec:
@@ -12249,10 +12249,10 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 62dc2ebafa7c1649955e3daf06fdf79cb26883b0fdd82a9b106b72e25124f44d
+        checksum/config: 83915f92752ded220817e4effa20d39751823fd6083dd533081665dd44ad1a29
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: 1eb95a63f7416d33c13fd9729faeac8b373793675273cfba615ab47307d4dbbe
-        checksum/secret: b912978a01a7e961d70c60c6edde78237c998910a207e671d4badfdd0388a058
+        checksum/sc-dashboard-provider-config: 85f1a1eb4f77a4649b2a50d33a550f768cadfa4332d66a28d1506d244e2b2ecc
+        checksum/secret: 571db293649bf4dc18ef89dd886ba22dbc61da213c5bfb1b42c13d0cd0c2105c
       labels:
         app.kubernetes.io/instance: prometheus-operator
         app.kubernetes.io/name: grafana
@@ -12452,7 +12452,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-operator
-        chart: prometheus-operator-8.13.4
+        chart: prometheus-operator-8.13.5
         heritage: Tiller
         release: prometheus-operator
     spec:
@@ -12600,7 +12600,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-admission-create
-        chart: prometheus-operator-8.13.4
+        chart: prometheus-operator-8.13.5
         heritage: Tiller
         release: prometheus-operator
       name: prometheus-operator-admission-create
@@ -12637,7 +12637,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-admission-patch
-        chart: prometheus-operator-8.13.4
+        chart: prometheus-operator-8.13.5
         heritage: Tiller
         release: prometheus-operator
       name: prometheus-operator-admission-patch
@@ -12699,7 +12699,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana
   namespace: monitoring
 spec:
@@ -12748,7 +12748,7 @@ kind: Alertmanager
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -12776,7 +12776,7 @@ kind: Prometheus
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -12841,7 +12841,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: helm-exporter
@@ -12874,7 +12874,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: nginx-ingress-controller-metrics
@@ -12907,7 +12907,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -12930,7 +12930,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-apiserver
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-apiserver
@@ -12958,7 +12958,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-coredns
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-coredns
@@ -12981,7 +12981,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-grafana
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-grafana
@@ -13003,7 +13003,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-controller-manager
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-controller-manager
@@ -13026,7 +13026,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-etcd
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-etcd
@@ -13049,7 +13049,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-proxy
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-proxy
@@ -13072,7 +13072,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-scheduler
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler
@@ -13095,7 +13095,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-state-metrics
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-state-metrics
@@ -13115,7 +13115,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kubelet
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubelet
@@ -13158,7 +13158,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-node-exporter
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-exporter
@@ -13177,7 +13177,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-operator
@@ -13199,7 +13199,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -13222,7 +13222,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.4
+    chart: prometheus-operator-8.13.5
     heritage: Tiller
     release: prometheus-operator
   name: velero-metrics
@@ -13332,7 +13332,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-test
   namespace: monitoring
 spec:
@@ -13369,7 +13369,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana
   namespace: monitoring
 spec:
@@ -13563,7 +13563,7 @@ metadata:
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 6.7.3
-    helm.sh/chart: grafana-5.0.18
+    helm.sh/chart: grafana-5.0.22
   name: prometheus-operator-grafana-test
   namespace: monitoring
 spec:
