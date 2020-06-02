@@ -11063,7 +11063,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.8.7
+    helm.sh/chart: kube-state-metrics-2.8.8
   name: prometheus-operator-kube-state-metrics
   namespace: monitoring
 ---
@@ -11385,7 +11385,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.8.7
+    helm.sh/chart: kube-state-metrics-2.8.8
   name: psp-prometheus-operator-kube-state-metrics
 rules:
 - apiGroups:
@@ -11422,7 +11422,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.8.7
+    helm.sh/chart: kube-state-metrics-2.8.8
   name: prometheus-operator-kube-state-metrics
 rules:
 - apiGroups:
@@ -11806,7 +11806,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.8.7
+    helm.sh/chart: kube-state-metrics-2.8.8
   name: psp-prometheus-operator-kube-state-metrics
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -11841,7 +11841,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.8.7
+    helm.sh/chart: kube-state-metrics-2.8.8
   name: prometheus-operator-kube-state-metrics
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -12138,7 +12138,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.8.7
+    helm.sh/chart: kube-state-metrics-2.8.8
   name: prometheus-operator-kube-state-metrics
   namespace: monitoring
 spec:
@@ -12361,7 +12361,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.8.7
+    helm.sh/chart: kube-state-metrics-2.8.8
   name: prometheus-operator-kube-state-metrics
   namespace: monitoring
 spec:
@@ -12424,6 +12424,7 @@ spec:
       hostNetwork: false
       securityContext:
         fsGroup: 65534
+        runAsGroup: 65534
         runAsUser: 65534
       serviceAccountName: prometheus-operator-kube-state-metrics
 ---
@@ -12445,7 +12446,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-operator
-        chart: prometheus-operator-8.13.10
+        chart: prometheus-operator-8.13.11
         heritage: Tiller
         release: prometheus-operator
     spec:
@@ -12593,7 +12594,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-admission-create
-        chart: prometheus-operator-8.13.10
+        chart: prometheus-operator-8.13.11
         heritage: Tiller
         release: prometheus-operator
       name: prometheus-operator-admission-create
@@ -12630,7 +12631,7 @@ spec:
     metadata:
       labels:
         app: prometheus-operator-admission-patch
-        chart: prometheus-operator-8.13.10
+        chart: prometheus-operator-8.13.11
         heritage: Tiller
         release: prometheus-operator
       name: prometheus-operator-admission-patch
@@ -12741,7 +12742,7 @@ kind: Alertmanager
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -12769,7 +12770,7 @@ kind: Prometheus
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -12834,7 +12835,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: helm-exporter
@@ -12867,7 +12868,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: nginx-ingress-controller-metrics
@@ -12900,7 +12901,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-alertmanager
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-alertmanager
@@ -12923,7 +12924,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-apiserver
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-apiserver
@@ -12951,7 +12952,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-coredns
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-coredns
@@ -12974,7 +12975,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-grafana
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-grafana
@@ -12996,7 +12997,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-controller-manager
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-controller-manager
@@ -13019,7 +13020,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-etcd
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-etcd
@@ -13042,7 +13043,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-proxy
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-proxy
@@ -13065,7 +13066,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-scheduler
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-scheduler
@@ -13088,7 +13089,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kube-state-metrics
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kube-state-metrics
@@ -13108,7 +13109,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-kubelet
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-kubelet
@@ -13163,7 +13164,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-node-exporter
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-node-exporter
@@ -13182,7 +13183,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-operator
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-operator
@@ -13204,7 +13205,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: prometheus-operator-prometheus
@@ -13227,7 +13228,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus-operator-prometheus
-    chart: prometheus-operator-8.13.10
+    chart: prometheus-operator-8.13.11
     heritage: Tiller
     release: prometheus-operator
   name: velero-metrics
@@ -13533,7 +13534,7 @@ metadata:
     app.kubernetes.io/instance: prometheus-operator
     app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: kube-state-metrics
-    helm.sh/chart: kube-state-metrics-2.8.7
+    helm.sh/chart: kube-state-metrics-2.8.8
   name: prometheus-operator-kube-state-metrics
 spec:
   fsGroup:
