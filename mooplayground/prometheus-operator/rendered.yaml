@@ -6384,7 +6384,8 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector:
     matchLabels:
-      release: prometheus-operator
+      #release: prometheus-operator
+      type: velero
   thanos:
     baseImage: quay.io/thanos/thanos
     objectStorageConfig:
@@ -6780,6 +6781,7 @@ metadata:
     chart: prometheus-operator-8.3.1
     heritage: Tiller
     release: prometheus-operator
+    type: velero
   name: velero-metrics
   namespace: monitoring
 spec:

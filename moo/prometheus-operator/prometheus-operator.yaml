@@ -6378,17 +6378,18 @@ spec:
   resources:
     limits:
       cpu: 2
-      memory: 4Gi
+      memory: 1Gi
     requests:
       cpu: 200m
-      memory: 4Gi
-  retention: 1d
+      memory: 1Gi
+  retention: 3h
   routePrefix: /
   ruleNamespaceSelector: {}
   ruleSelector:
     matchLabels:
       app: prometheus-operator
       release: prometheus-operator
+  scrapeInterval: 1m
   securityContext:
     fsGroup: 2000
     runAsNonRoot: true
@@ -6397,7 +6398,8 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector:
     matchLabels:
-      release: prometheus-operator
+      #release: prometheus-operator
+      type: velero
   thanos:
     baseImage: quay.io/thanos/thanos
     objectStorageConfig:
@@ -6412,6 +6414,7 @@ spec:
         memory: 512Mi
     version: v0.8.1
   version: v2.13.1
+  walCompression: true
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -6793,6 +6796,7 @@ metadata:
     chart: prometheus-operator-8.3.0
     heritage: Tiller
     release: prometheus-operator
+    type: velero
   name: velero-metrics
   namespace: monitoring
 spec:
