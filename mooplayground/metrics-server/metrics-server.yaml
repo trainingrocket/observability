@@ -201,7 +201,7 @@ kind: APIService
 metadata:
   labels:
     app: metrics-server
-    chart: metrics-server-2.11.1
+    chart: metrics-server-2.11.2
     heritage: Tiller
     release: metrics-server
   name: v1beta1.metrics.k8s.io
@@ -256,6 +256,7 @@ spec:
     - wget -qO- https://metrics-server:443/version | grep -F v0.3.6
     command:
     - /bin/sh
-    image: busybox
+    image: busybox:latest
+    imagePullPolicy: IfNotPresent
     name: wget
   restartPolicy: Never
